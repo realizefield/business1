@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ビジネス学習 06：コンピューターの構成</title>
+<style>
+  body { font-family: "Meiryo", sans-serif; max-width: 960px; margin: 20px auto; line-height: 1.8; background-color: #f4f4f9; font-size: 16px; }
+  
+  .step-bar { display: flex; gap: 8px; margin-bottom: 15px; }
+  .step { 
+    flex: 1; text-align: center; padding: 10px; border-radius: 999px; 
+    background-color: #ddd; color: #666; font-size: 12px; cursor: pointer; 
+    text-decoration: none; font-weight: bold; transition: 0.3s;
+  }
+  .step.active { background-color: #fff3e0; color: #e65100; border: 1px solid #e65100; }
+  .step:hover { opacity: 0.8; }
+
+  h1 { color: #333; border-left: 6px solid #e65100; padding-left: 15px; margin-top: 10px; }
+  .instruction { background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ccc; }
+  
+  table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
+  th { background-color: #fff3e0; }
+
+  .blank {
+    display: inline-block; min-width: 160px; height: 28px; background-color: #e8f5e9; 
+    cursor: pointer; vertical-align: middle; text-align: center; border-radius: 4px; 
+    border: none; font-weight: bold; color: #e65100;
+  }
+  .blank.correct { background-color: #c8e6c9; color: #2e7d32; }
+
+  .word-bank-wrapper { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; }
+  .word-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .word-chip { padding: 8px 15px; border: 1px solid #e65100; border-radius: 20px; background: #fff; cursor: pointer; user-select: none; }
+  .word-chip.selected-chip { background-color: #ffe0b2; }
+  .word-chip.used { opacity: 0.3; cursor: default; }
+
+  .controls { margin-top: 20px; display: flex; gap: 10px; align-items: center; }
+  button { padding: 10px 20px; border: none; border-radius: 5px; background: #e65100; color: #fff; cursor: pointer; font-size: 16px; }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  .timer { font-size: 18px; font-weight: bold; color: #d32f2f; margin-left: auto; }
+
+  .pop-container { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+  .pop-btn { flex: 1; min-width: 220px; padding: 15px; background: #fff; border: 2px solid #e65100; border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold; }
+  .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+  .modal-content { background: #fff; margin: 10% auto; padding: 25px; width: 65%; border-radius: 12px; position: relative; }
+  .close { position: absolute; right: 20px; top: 10px; font-size: 30px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="step-bar">
+  <a href="business_study01.html" class="step">① ビジネス</a>
+  <a href="business_study02.html" class="step">② 権利・ICT</a>
+  <a href="business_study03.html" class="step">③ 情報流出</a>
+  <a href="business_study04.html" class="step">④ 発達史</a>
+  <a href="business_study05.html" class="step">⑤ しくみ</a>
+  <a href="business_study06.html" class="step active">⑥ 構成と用語</a>
+</div>
+
+<h1>コンピューターの構成と重要用語 (06)</h1>
+
+<div class="instruction">
+  <p><strong>使い方：</strong><br>
+  1. 「チャレンジ開始」を押すと、表の用語が消えます。<br>
+  2. 下の語群から言葉を選んで、空欄を埋めてください。すべて埋めたら「判定」を押します。</p>
+</div>
+
+<table>
+  <thead>
+    <tr><th>分類</th><th>用語</th><th>説明・機能</th><th>具体例</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">物理的な機器</td>
+      <td><span class="blank" data-answer="ハードウェア">ハードウェア</span></td>
+      <td>コンピューター本体を構成する機械そのもの。</td>
+      <td>CPU、メモリ、基板</td>
+    </tr>
+    <tr>
+      <td><span class="blank" data-answer="周辺機器">周辺機器</span></td>
+      <td>本体に接続して機能を追加する外部装置。</td>
+      <td>プリンタ、マウス、スキャナ</td>
+    </tr>
+    <tr>
+      <td rowspan="3">プログラム</td>
+      <td><span class="blank" data-answer="オペレーティングシステム(OS)">オペレーティングシステム(OS)</span></td>
+      <td>基本ソフトウェア。全体を管理・制御する。</td>
+      <td>Windows, macOS, iOS</td>
+    </tr>
+    <tr>
+      <td><span class="blank" data-answer="アプリケーションソフトウェア">アプリケーションソフトウェア</span></td>
+      <td>応用ソフト。特定の目的のために使う。</td>
+      <td>Word, Excel, ブラウザ</td>
+    </tr>
+    <tr>
+      <td><span class="blank" data-answer="デバイスドライバ">デバイスドライバ</span></td>
+      <td>OSが周辺機器を正しく動かすための専用ソフト。</td>
+      <td>プリンタドライバなど</td>
+    </tr>
+    <tr>
+      <td rowspan="2">接点（UI）</td>
+      <td><span class="blank" data-answer="GUI">GUI</span></td>
+      <td>アイコン等を直感的に操作する形式。</td>
+      <td>Windowsのデスクトップ等</td>
+    </tr>
+    <tr>
+      <td><span class="blank" data-answer="CUI">CUI</span></td>
+      <td>文字入力だけで命令を出す形式。</td>
+      <td>コマンドプロンプト等</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="word-bank-wrapper">
+  <strong>【語群】</strong>
+  <div id="word-bank" class="word-bank"></div>
+</div>
+
+<div class="controls">
+  <button id="start-btn">チャレンジ開始</button>
+  <button id="check-btn" disabled>判定</button>
+  <button onclick="location.reload()" style="background:#666; color:white; border-radius:5px; padding:10px 20px; border:none; cursor:pointer;">リセット</button>
+  <div id="timer" class="timer">経過時間：--秒</div>
+</div>
+
+<div class="pop-container">
+  <div class="pop-btn" onclick="openPop('ui')">pop1: ユーザーインタフェイス</div>
+  <div class="pop-btn" onclick="openPop('software')">pop2: ソフトウェアの分類</div>
+  <div class="pop-btn" onclick="openPop('driver')">pop3: デバイスドライバの役割</div>
+</div>
+
+<div id="popModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePop()">&times;</span>
+    <h2 id="pop-title" style="color:#e65100;"></h2>
+    <div id="pop-body" style="font-size: 18px; line-height: 1.8;"></div>
+  </div>
+</div>
+
+<script>
+  // 判定に使われる正解リストと語群リストを完全に一致させています
+  const words = ["ハードウェア", "周辺機器", "オペレーティングシステム(OS)", "アプリケーションソフトウェア", "デバイスドライバ", "GUI", "CUI"];
+  let selectedChip = null;
+  let startTime = null;
+  let timerInterval = null;
+
+  const popData = {
+    ui: { 
+      t: "ユーザーインタフェイス (User Interface)", 
+      b: "人間とコンピューターの窓口です。<br>・<b>GUI (Graphical User Interface)</b>: マウスや指で直感的に操作する方式。<br>・<b>CUI (Character User Interface)</b>: キーボードから文字だけで命令を入力する方式。" 
+    },
+    software: { t: "ソフトウェアの構成", b: "基本となる『OS』と、その上で動く『アプリケーション』に分けられます。" },
+    driver: { t: "デバイスドライバ", b: "OSが周辺機器と通信するための「通訳」の役割をするソフトです。" }
+  };
+
+  function openPop(id) {
+    document.getElementById('pop-title').textContent = popData[id].t;
+    document.getElementById('pop-body').innerHTML = popData[id].b;
+    document.getElementById('popModal').style.display = "block";
+  }
+  function closePop() { document.getElementById('popModal').style.display = "none"; }
+
+  function renderBank() {
+    const bank = document.getElementById('word-bank');
+    bank.innerHTML = '';
+    [...words].sort(() => Math.random() - 0.5).forEach(word => {
+      const chip = document.createElement('div');
+      chip.className = 'word-chip';
+      chip.textContent = word;
+      chip.onclick = () => {
+        if (!startTime || chip.classList.contains('used')) return;
+        if (selectedChip) selectedChip.classList.remove('selected-chip');
+        selectedChip = chip;
+        chip.classList.add('selected-chip');
+      };
+      bank.appendChild(chip);
+    });
+  }
+
+  document.getElementById('start-btn').onclick = () => {
+    document.querySelectorAll('.blank').forEach(b => { 
+      b.textContent = ''; b.removeAttribute('data-val'); b.classList.remove('correct'); 
+    });
+    renderBank();
+    document.getElementById('check-btn').disabled = false;
+    document.getElementById('start-btn').disabled = true;
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const diff = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('timer').textContent = `経過時間：${diff}秒`;
+    }, 1000);
+  };
+
+  document.querySelectorAll('.blank').forEach(blank => {
+    blank.onclick = () => {
+      if (!startTime) return;
+      if (selectedChip) {
+        // すでに何か入っていたら元に戻す
+        if (blank.getAttribute('data-val')) {
+          const prevWord = blank.getAttribute('data-val');
+          const chips = document.querySelectorAll('.word-chip');
+          chips.forEach(c => { if(c.textContent === prevWord) c.classList.remove('used'); });
+        }
+        // 新しい値をセット
+        blank.textContent = selectedChip.textContent;
+        blank.setAttribute('data-val', selectedChip.textContent);
+        selectedChip.classList.add('used');
+        selectedChip.classList.remove('selected-chip');
+        selectedChip = null;
+      } else if (blank.getAttribute('data-val')) {
+        // 何も選択せずに空欄を押すとキャンセル
+        const prevWord = blank.getAttribute('data-val');
+        const chips = document.querySelectorAll('.word-chip');
+        chips.forEach(c => { if(c.textContent === prevWord) c.classList.remove('used'); });
+        blank.textContent = '';
+        blank.removeAttribute('data-val');
+      }
+    };
+  });
+
+  document.getElementById('check-btn').onclick = () => {
+    let allCorrect = true;
+    const blanks = document.querySelectorAll('.blank');
+    blanks.forEach(b => {
+      const userAnswer = b.getAttribute('data-val');
+      const correctAnswer = b.getAttribute('data-answer');
+      if (userAnswer === correctAnswer) {
+        b.classList.add('correct');
+      } else {
+        allCorrect = false;
+      }
+    });
+
+    if (allCorrect) { 
+        clearInterval(timerInterval); 
+        alert("全問正解！06クリアです。"); 
+    } else {
+        alert("間違いがあるか、未入力の箇所があります。");
+    }
+  };
+
+  window.onclick = function(event) { if (event.target == document.getElementById('popModal')) closePop(); }
+  renderBank();
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ICT・権利用語学習(02)</title>
+<style>
+  body { font-family: "Meiryo", sans-serif; max-width: 960px; margin: 20px auto; line-height: 1.8; background-color: #f4f4f9; font-size: 16px; }
+  
+  /* 進捗状況タグのスタイル */
+  .step-bar { display: flex; gap: 8px; margin-bottom: 15px; }
+  .step { 
+    flex: 1; text-align: center; padding: 10px; border-radius: 999px; 
+    background-color: #ddd; color: #666; font-size: 14px; cursor: pointer; 
+    text-decoration: none; font-weight: bold; transition: 0.3s;
+  }
+  .step.active { background-color: #fff3e0; color: #e67e22; border: 1px solid #e67e22; }
+  .step:hover { opacity: 0.8; }
+
+  h1 { color: #333; border-left: 6px solid #e67e22; padding-left: 15px; margin-top: 10px; }
+  .instruction { background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ccc; }
+  
+  table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
+  th { background-color: #fff3e0; }
+
+  .blank {
+    display: inline-block; min-width: 140px; height: 28px; background-color: #e8f5e9; 
+    cursor: pointer; vertical-align: middle; text-align: center; border-radius: 4px; 
+    border: none; font-weight: bold; color: #e67e22;
+  }
+  .blank.correct { background-color: #c8e6c9; color: #2e7d32; }
+
+  .word-bank-wrapper { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; }
+  .word-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .word-chip { padding: 8px 15px; border: 1px solid #e67e22; border-radius: 20px; background: #fff; cursor: pointer; user-select: none; }
+  .word-chip.selected-chip { background-color: #ffe0b2; }
+  .word-chip.used { opacity: 0.3; cursor: default; }
+
+  .controls { margin-top: 20px; display: flex; gap: 10px; align-items: center; }
+  button { padding: 10px 20px; border: none; border-radius: 5px; background: #e67e22; color: #fff; cursor: pointer; font-size: 16px; }
+  .timer { font-size: 18px; font-weight: bold; color: #d32f2f; margin-left: auto; }
+
+  .pop-container { display: flex; gap: 15px; margin-top: 30px; }
+  .pop-btn { flex: 1; padding: 15px; background: #fff; border: 2px solid #e67e22; border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold; }
+  .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+  .modal-content { background: #fff; margin: 15% auto; padding: 25px; width: 50%; border-radius: 12px; position: relative; }
+  .close { position: absolute; right: 20px; top: 10px; font-size: 30px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="step-bar">
+  <a href="business_study01.html" class="step">① ビジネスモデル</a>
+  <a href="business_study02.html" class="step active">② 権利・ICT</a>
+  <a href="business_study03.html" class="step">③ 情報流出</a>
+  <a href="business_study04.html" class="step">④ 発達史</a>
+  <a href="business_study05.html" class="step">⑤ しくみ</a>
+  <a href="business_study06.html" class="step">⑥ 構成と用語</a>
+</div>
+
+<h1>ICT・権利用語：穴埋めトレーニング (02)</h1>
+
+<table>
+  <thead>
+    <tr><th>用語</th><th>意味・概要</th><th>具体的な例</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><span class="blank" data-id="デジタルディバイド">デジタルディバイド</span></td><td>ITを利用できる人とできない人の間に生じる格差。</td><td>高齢者のスマホ利用困難</td></tr>
+    <tr><td><span class="blank" data-id="情報リテラシー">情報リテラシー</span></td><td>情報を正しく理解し、活用する能力。</td><td>偽ニュースの見抜き</td></tr>
+    <tr><td><span class="blank" data-id="肖像権">肖像権</span></td><td>自分の容姿を勝手に公表されない権利。</td><td>無断での写真投稿</td></tr>
+    <tr><td><span class="blank" data-id="パブリシティ権">パブリシティ権</span></td><td>有名人の経済的価値を守る権利。</td><td>有名人を勝手に宣伝に使う</td></tr>
+  </tbody>
+</table>
+
+<div class="word-bank-wrapper">
+  <strong>【語群】</strong>
+  <div id="word-bank" class="word-bank"></div>
+</div>
+
+<div class="controls">
+  <button id="start-btn">チャレンジ開始</button>
+  <button id="check-btn" disabled>判定</button>
+  <div id="timer" class="timer">経過時間：--秒</div>
+</div>
+
+<div class="pop-container">
+  <div class="pop-btn" onclick="openPop('divide')">pop1: デジタルディバイドとは</div>
+  <div class="pop-btn" onclick="openPop('literacy')">pop2: 情報リテラシーとは</div>
+  <div class="pop-btn" onclick="openPop('publicity')">pop3: パブリシティ権とは</div>
+</div>
+
+<div id="popModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePop()">&times;</span>
+    <h2 id="pop-title" style="color:#e67e22;"></h2>
+    <p id="pop-body" style="font-size: 18px; line-height: 1.8;"></p>
+  </div>
+</div>
+
+<script>
+  const words = ["デジタルディバイド", "情報リテラシー", "肖像権", "パブリシティ権"];
+  let selectedChip = null;
+  let startTime;
+  let timerInterval;
+
+  const popData = {
+    divide: { t: "Digital Divide", b: "ITを使える人と使えない人の間に生まれる『格差』のことです。" },
+    literacy: { t: "Information Literacy", b: "正しい情報を選び出し使いこなす『知恵や能力』のことです。" },
+    publicity: { t: "Right of Publicity", b: "有名人の名前や写真が持つ『経済的価値』を守る権利です。" }
+  };
+
+  function openPop(id) {
+    document.getElementById('pop-title').textContent = popData[id].t;
+    document.getElementById('pop-body').textContent = popData[id].b;
+    document.getElementById('popModal').style.display = "block";
+  }
+  function closePop() { document.getElementById('popModal').style.display = "none"; }
+
+  function renderBank() {
+    const bank = document.getElementById('word-bank');
+    bank.innerHTML = '';
+    [...words].sort(() => Math.random() - 0.5).forEach(word => {
+      const chip = document.createElement('div');
+      chip.className = 'word-chip';
+      chip.textContent = word;
+      chip.onclick = () => {
+        if (chip.classList.contains('used')) return;
+        if (selectedChip) selectedChip.classList.remove('selected-chip');
+        selectedChip = chip;
+        chip.classList.add('selected-chip');
+      };
+      bank.appendChild(chip);
+    });
+  }
+
+  document.getElementById('start-btn').onclick = () => {
+    document.querySelectorAll('.blank').forEach(b => { b.textContent = ''; b.dataset.val = ''; b.classList.remove('correct'); });
+    renderBank();
+    document.getElementById('check-btn').disabled = false;
+    document.getElementById('start-btn').disabled = true;
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const diff = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('timer').textContent = `経過時間：${diff}秒`;
+    }, 1000);
+  };
+
+  document.querySelectorAll('.blank').forEach(blank => {
+    blank.onclick = () => {
+      if (!startTime) return;
+      if (selectedChip) {
+        if (blank.dataset.val) {
+          const oldChip = Array.from(document.querySelectorAll('.word-chip')).find(c => c.textContent === blank.dataset.val);
+          if (oldChip) oldChip.classList.remove('used');
+        }
+        blank.textContent = selectedChip.textContent;
+        blank.dataset.val = selectedChip.textContent;
+        selectedChip.classList.add('used');
+        selectedChip.classList.remove('selected-chip');
+        selectedChip = null;
+      }
+    };
+  });
+
+  document.getElementById('check-btn').onclick = () => {
+    let allCorrect = true;
+    document.querySelectorAll('.blank').forEach(b => {
+      if (b.dataset.val === b.dataset.id) { b.classList.add('correct'); } else { allCorrect = false; }
+    });
+    if (allCorrect) { clearInterval(timerInterval); alert("02クリア！"); }
+  };
+
+  window.onclick = function(event) { if (event.target == document.getElementById('popModal')) closePop(); }
+  renderBank();
+</script>
+</body>
+</html>
