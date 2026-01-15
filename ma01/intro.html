@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-container">
+    <h1>MA01 分数の性質・通分 【導入】</h1>
+    <div class="step-navigation">
+    <div class="step-item {{ 'active' if page == 'intro' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='intro') }}">① 導入</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'example' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='example') }}">② 例題</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'drill' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='drill') }}">③ 演習</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'check' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='check') }}">④ 確認</a>
+    </div>
+</div>
+    <div class="section">
+        <h2>通分（つうぶん）とは？</h2>
+        <p>分数の分母と分子に<strong>同じ数をかけても</strong>、分数の大きさは変わりません。この性質を使って分母をそろえることを<strong>通分</strong>といいます。</p>
+
+        <div class="problem-box">
+            <h3>ルール：分母と分子に「同じ数」をかける</h3>
+            <p>$\frac{1}{2}$ の分母を 2倍し、分子も 2倍してみましょう。</p>
+            
+            <div class="q-item" style="text-align: center; font-size: 1.5em; padding: 20px;">
+                {# HTML分数とMathJax数式を併記して確実に表示させます #}
+                $$\frac{1 \times 2}{2 \times 2} = \frac{2}{4}$$
+            </div>
+            <p>つまり、$\frac{1}{2}$ と $\frac{2}{4}$ は<strong>同じ大きさ</strong>の分数です。</p>
+        </div>
+
+        <div class="important-box">
+            【まとめ】<br>
+            分母を 3倍したら、分子も 3倍する。<br>
+            分母を 4倍したら、分子も 4倍する。<br>
+            そうすれば、分数の大きさは変わりません！
+        </div>
+
+        <div class="nav-buttons">
+            <a href="{{ url_for('math_home') }}" class="btn btn-secondary btn-lg">単元一覧へ</a>
+            <a href="{{ url_for('math_unit_page', unit_code='MA01', page='example') }}" class="btn btn-primary btn-lg">次は【例題】へ →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

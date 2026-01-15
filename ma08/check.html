@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .page-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #fae8ff; color: #701a75; border: 2px solid #d946ef; }
+    
+    .result-container { text-align: center; margin: 20px 0; padding: 25px; border-radius: 20px; border: 4px solid; }
+    .passed { background: #f0fdf4; border-color: #22c55e; color: #15803d; }
+    .failed { background: #fff1f2; border-color: #ef4444; color: #991b1b; }
+
+    .action-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
+    .btn-menu { display: inline-block; padding: 15px 30px; background-color: #64748b; color: white; text-decoration: none; border-radius: 50px; font-size: 1.1em; font-weight: bold; box-shadow: 0 4px #475569; transition: 0.2s; }
+    .btn-next { display: inline-block; padding: 15px 40px; background-color: #a21caf; color: white; text-decoration: none; border-radius: 50px; font-size: 1.2em; font-weight: bold; box-shadow: 0 4px #701a75; transition: 0.2s; }
+    
+    .problem-card { display: flex; align-items: center; padding: 25px 0; border-bottom: 1px solid #e2e8f0; gap: 12px; flex-wrap: wrap; }
+    .whole-num { font-size: 2.2em; font-weight: bold; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+    .fraction-num { border-bottom: 2px solid #333; padding: 0 8px; font-size: 1.8em; }
+    .fraction-den { padding: 0 8px; font-size: 1.8em; }
+    
+    .answer-box { border: 2px solid #d946ef; border-radius: 10px; width: 85px; height: 55px; text-align: center; font-size: 1.8em; font-weight: bold; outline: none; }
+    .answer-box[readonly] { border-color: #22c55e; background: #f0fdf4 !important; color: #15803d !important; }
+    
+    .hint-btn { background: #d946ef; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-weight: bold; cursor: pointer; margin-left: auto; }
+    .hint-box { display: none; width: 100%; background: #fdf4ff; border: 2px dashed #d946ef; padding: 15px; border-radius: 10px; margin-top: 10px; color: #701a75; text-align: left; }
+    .hint-fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-weight: bold; margin: 0 5px; }
+    .hint-n { border-bottom: 2px solid #701a75; padding: 0 5px; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #a21caf; text-align: center;">MA08 帯分数の計算 【④ 確認テスト】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='drill') }}" class="step-item">③ 演習</a>
+        <div class="step-item active">④ 確認</div>
+    </div>
+
+    {% if result %}
+        <div class="result-container {{ 'passed' if result.is_passed else 'failed' }}">
+            <h2 style="font-size: 2.2em; margin: 0;">{{ result.total_count }}問中 {{ result.correct_count }} 問正解！</h2>
+            <p style="font-size: 1.3em; margin-top: 10px; font-weight: bold;">
+                {% if result.is_passed %}
+                    🎉 おめでとうございます！分数の基本ユニットをすべてクリアしました！
+                {% else %}
+                    あともう少し！間違えた問題の「解き方」を確認して再挑戦しましょう。
+                {% endif %}
+            </p>
+            
+            {% if result.is_passed %}
+            <div class="action-buttons">
+                <a href="{{ url_for('index') }}" class="btn-menu">🏠 単元一覧にもどる</a>
+                <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='intro') }}" class="btn-next">次の単元（MA09）へ進む ➔</a>
+            </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        <div style="background: white; border-radius: 15px; padding: 25px; border: 1px solid #e2e8f0;">
+            {% set c_idx = namespace(val=0) %}
+            {% for p in problems if 'c' in p.id %}
+                {% set c_idx.val = c_idx.val + 1 %}
+                <div class="problem-card">
+                    <span style="font-size: 1.5em;">({{ c_idx.val }})</span>
+                    {% if p.w1 > 0 %}<span class="whole-num">{{ p.w1 }}</span>{% endif %}
+                    <div class="fraction"><span class="fraction-num">{{ p.n1 }}</span><span class="fraction-den">{{ p.d1 }}</span></div>
+                    <span style="font-size: 1.8em; font-weight: bold;">{{ '＋' if p.type == 'add' else '－' }}</span>
+                    {% if p.w2 > 0 %}<span class="whole-num">{{ p.w2 }}</span>{% endif %}
+                    <div class="fraction"><span class="fraction-num">{{ p.n2 }}</span><span class="fraction-den">{{ p.d2 }}</span></div>
+                    <span style="font-size: 2em;">＝</span>
+
+                    {% set u_n = request.form.get(p.id ~ '_n', '') %}
+                    {% set u_d = request.form.get(p.id ~ '_d', '') %}
+                    {% set is_this_correct = (u_n|int == p.ans_n and u_d|int == p.ans_d) if result else False %}
+
+                    <div class="fraction">
+                        <input type="number" name="{{ p.id }}_n" class="answer-box" value="{{ u_n }}" {{ 'readonly' if is_this_correct else '' }} required>
+                        <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                        <input type="number" name="{{ p.id }}_d" class="answer-box" value="{{ u_d }}" {{ 'readonly' if is_this_correct else '' }} required>
+                    </div>
+
+                    {% if result %}
+                        <span style="font-size: 2.5em; margin-left: 10px; color: {{ '#22c55e' if is_this_correct else '#ef4444' }};">
+                            {{ '〇' if is_this_correct else '×' }}
+                        </span>
+                        {% if not is_this_correct %}
+                            <button type="button" class="hint-btn" onclick="toggleHint('hc{{ c_idx.val }}')">解き方</button>
+                        {% endif %}
+                    {% endif %}
+
+                    <div id="hc{{ c_idx.val }}" class="hint-box">
+                        💡 <b>解き方のポイント：</b><br>
+                        帯分数を仮分数になおして計算します。<br>
+                        {% if p.w1 > 0 %}
+                        {{ p.w1 }}<div class="hint-fraction"><span class="hint-n">{{ p.n1 }}</span><span>{{ p.d1 }}</span></div> は 
+                        <div class="hint-fraction"><span class="hint-n">{{ (p.w1 * p.d1) + p.n1 }}</span><span>{{ p.d1 }}</span></div> になります。<br>
+                        {% endif %}
+                        答えは <div class="hint-fraction"><span class="hint-n">{{ p.ans_n }}</span><span>{{ p.ans_d }}</span></div> です。
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if not result or not result.is_passed %}
+        <div style="text-align: center;">
+            <button type="submit" style="background:#d946ef; color:white; padding:15px 100px; border-radius:50px; margin-top:30px; border:none; font-size:1.5em; font-weight:bold; cursor:pointer; box-shadow: 0 4px #a21caf;">判定する</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function toggleHint(id) {
+    const h = document.getElementById(id);
+    if (h) h.style.display = (h.style.display === "block") ? "none" : "block";
+}
+</script>
+{% endblock %}

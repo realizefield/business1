@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    .intro-card { background: white; border-radius: 15px; border: 2px solid #e2e8f0; padding: 30px; margin-bottom: 20px; }
+    .point-box { background: #fffbeb; border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0; }
+    .fraction-display { font-size: 2em; vertical-align: middle; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA04 通分する計算 【① 導入】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA04', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA04', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA04', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="intro-card">
+        <h2>分母がちがうと、たせない？</h2>
+        <p style="font-size: 1.2em; line-height: 1.8;">
+            いままで学習した計算は、分母が同じでした。<br>
+            <span style="color: #3b82f6; font-weight: bold;">\(\frac{1}{4} + \frac{2}{4} = \frac{3}{4}\)</span> のように、大きさがそろっていれば簡単です。
+        </p>
+
+        <div class="point-box">
+            <h3 style="color: #d97706; margin-top: 0;">⚠️ こまった！</h3>
+            <p style="font-size: 1.2em;">
+                <span style="font-size: 1.5em; color: #dc2626;">\(\frac{1}{2} + \frac{1}{3}\)</span> はどうでしょう？<br>
+                分母（下の数）がちがうと、１つのパーツの大きさがちがうので、そのままたすことができません。
+            </p>
+        </div>
+
+        
+
+        <h3>解決策：大きさをそろえよう！（通分）</h3>
+        <p style="font-size: 1.2em;">
+            分母を同じ数にすることを<b>「通分（つうぶん）」</b>といいます。<br>
+            おたがいの分母をかけ算して、同じ大きさに切り分ければ計算できるようになります！
+        </p>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="{{ url_for('math_unit_page', unit_code='MA04', page='example') }}" class="btn" style="background: #3b82f6; color: white; padding: 15px 50px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2em;">つぎへ（例題をみる） ➔</a>
+    </div>
+</div>
+{% endblock %}

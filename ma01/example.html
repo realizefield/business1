@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}MA01 例題{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1>MA01 分数の性質・通分 【例題】</h1>
+    <div class="step-navigation">
+    <div class="step-item {{ 'active' if page == 'intro' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='intro') }}">① 導入</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'example' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='example') }}">② 例題</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'drill' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='drill') }}">③ 演習</a>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item {{ 'active' if page == 'check' }}">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='check') }}">④ 確認</a>
+    </div>
+</div>
+</div>
+    <div class="section">
+        <h2>【例題】次の $\square$ にあてはまる数を答えなさい。</h2>
+        <div class="problem-box">
+            <div class="q-item" style="font-size: 1.5em; justify-content: center;">
+                <span class="fraction"><span class="num">2</span><span class="den">3</span></span>
+                ＝
+                <span class="fraction"><span class="num">$\square$</span><span class="den">12</span></span>
+            </div>
+        </div>
+
+        <details class="store-box">
+            <summary>考え方と答え（クリックで開く）</summary>
+            <div class="tight">
+                <p>分母が $3 \to 12$ へ **4倍** されています。</p>
+                <p>分子も同じく **4倍** するので $2 \times 4 = 8$ です。</p>
+                <p>答え：<strong>8</strong></p>
+            </div>
+        </details>
+
+        <div class="nav-buttons">
+            <a href="{{ url_for('math_unit_page', unit_code='MA01', page='intro') }}" class="btn btn-secondary">← 導入にもどる</a>
+            {# ✅ page='drill' にすることで類題（演習）へ進みます #}
+            <a href="{{ url_for('math_unit_page', unit_code='MA01', page='drill') }}" class="btn btn-primary">類題（演習）に進む →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* 進捗ボタン：130x50 固定（全ページ共通） */
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item {
+        width: 130px !important; height: 50px !important; display: flex; align-items: center; justify-content: center;
+        border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .step-navigation .step-item.active { background-color: #dbeafe !important; color: #1e40af !important; border: 2px solid #3b82f6 !important; }
+
+    /* 入力マス */
+    input[type="number"] {
+        font-size: 40px !important; font-weight: 900 !important; color: #1e40af !important;
+        height: 90px !important; width: 110px !important; text-align: center !important;
+        border: 3px solid #3b82f6 !important; border-radius: 12px !important;
+    }
+    .fraction { font-size: 2.5em; }
+    .mark-correct { color: #ef4444; font-size: 2.5em; font-weight: bold; margin-left: 20px; }
+    .mark-incorrect { color: #3b82f6; font-size: 2.5em; font-weight: bold; margin-left: 20px; }
+</style>
+
+<div class="page-container">
+    <h1>{{ unit_code }} 通分 【④ 確認テスト】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='drill') }}" class="step-item">③ 演習</a>
+        <div class="step-item active">④ 確認</div>
+    </div>
+
+    {% if result %}
+    <div id="result-area" style="text-align: center; margin: 20px 0; padding: 25px; border-radius: 15px; 
+                background: {{ '#ecfdf5' if result.is_passed else '#fff1f2' }}; border: 3px solid {{ '#10b981' if result.is_passed else '#3b82f6' }};">
+        {% if result.is_passed %}
+            <h2 style="color: #047857; font-size: 2.2em; margin: 0;">やりました。全問合格です。</h2>
+            <p style="font-size: 1.3em; margin: 15px 0;">おめでとう！次の単元に進めます。</p>
+            <a href="{{ url_for('math_unit_page', unit_code='MA03', page='intro') }}" class="btn btn-primary" style="padding: 15px 60px; border-radius: 50px; text-decoration: none; font-weight: bold; background-color: #10b981; color: white; display: inline-block;">次の単元へ進む</a>
+        {% else %}
+            <h2 style="color: #1e40af; font-size: 2.0em; margin: 0;">{{ result.total_count }}問中 {{ result.correct_count }} 問正解</h2>
+            <button type="button" onclick="retryIncorrect()" style="margin-top:10px; padding: 10px 30px; background: #64748b; color: white; border-radius: 10px; border: none; cursor: pointer; font-weight: bold;">間違いを消して再挑戦</button>
+        {% endif %}
+    </div>
+    {% else %}
+    <p style="background: #eef2ff; padding: 20px; border-radius: 8px; border-left: 5px solid #dc2626; font-size: 1.2em; margin-bottom: 30px;">
+        <strong>【問題】</strong> 同じ大きさの分数になるように、空欄に数字を入れなさい。
+    </p>
+    {% endif %}
+
+    <form method="post">
+        <div class="problem-box">
+            {% for p in problems %}
+            <div style="margin-bottom: 40px; display: flex; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 25px;">
+                <span style="width: 50px; color: #666;">({{ loop.index }})</span>
+                <span class="fraction"><span class="num">{{ p.n }}</span><span class="den">{{ p.d }}</span></span>
+                <span style="font-size: 2.5em; margin: 0 20px;">＝</span>
+                <span class="fraction">
+                    <span class="num">
+                        <input type="number" name="{{ p.id }}" value="{{ request.form.get(p.id, '') }}" data-ans="{{ p.ans }}" required>
+                    </span>
+                    <span class="den">{{ p.target_d }}</span>
+                </span>
+                {% if result %}
+                    {% set user_raw = request.form.get(p.id, '') %}
+                    {% if user_raw != '' %}
+                        <span class="{{ 'mark-correct' if user_raw|int == p.ans|int else 'mark-incorrect' }}">
+                            {{ '〇' if user_raw|int == p.ans|int else '×' }}
+                        </span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not result or not result.is_passed %}
+        <div style="text-align: center; margin-top: 40px;">
+            <button type="submit" style="padding: 20px 100px; border-radius: 50px; font-weight: bold; background-color: #dc2626; color: white; border: none; cursor: pointer; font-size: 1.5em;">判定する</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function retryIncorrect() {
+    if (document.getElementById('result-area')) document.getElementById('result-area').style.display = 'none';
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        if (String(input.value) !== String(input.getAttribute('data-ans'))) {
+            input.value = "";
+        }
+    });
+    document.querySelectorAll('.mark-correct, .mark-incorrect').forEach(el => el.style.display = 'none');
+}
+</script>
+{% endblock %}

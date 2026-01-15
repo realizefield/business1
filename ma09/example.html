@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+    
+    .example-card { background: white; border-radius: 15px; border: 2px solid #22c55e; padding: 30px; }
+    .math-row { background: #f0fdf4; padding: 25px; border-radius: 12px; margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.8em; flex-wrap: wrap; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+    .answer-box { border: 2px solid #22c55e; border-radius: 10px; width: 80px; height: 55px; text-align: center; font-size: 1em; font-weight: bold; outline: none; }
+    .answer-box.correct { border-color: #15803d; background: #dcfce7; color: #166534; }
+    .check-btn { background: #22c55e; color: white; border: none; border-radius: 20px; padding: 10px 30px; font-size: 0.6em; font-weight: bold; cursor: pointer; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #15803d;">MA09 整数 × 分数 【② 例題】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='intro') }}" class="step-item">① 導入</a>
+        <div class="step-item active">② 例題</div>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="example-card">
+        <h3>【例題】分子に整数をかけて計算してみよう。</h3>
+
+        <div class="math-row">
+            <span>3 ×</span>
+            <div class="fraction"><span style="border-bottom: 2px solid #333;">2</span><span>7</span></div>
+            <span>＝</span>
+            <div class="fraction">
+                <input type="number" id="ex1_n" class="answer-box" placeholder="?">
+                <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                <input type="number" id="ex1_d" class="answer-box" placeholder="?">
+            </div>
+            <button class="check-btn" onclick="checkEx(1, 6, 7)">答えあわせ</button>
+        </div>
+
+        <div class="math-row">
+            <div class="fraction"><span style="border-bottom: 2px solid #333;">3</span><span>11</span></div>
+            <span>× 2 ＝</span>
+            <div class="fraction">
+                <input type="number" id="ex2_n" class="answer-box" placeholder="?">
+                <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                <input type="number" id="ex2_d" class="answer-box" placeholder="?">
+            </div>
+            <button class="check-btn" onclick="checkEx(2, 6, 11)">答えあわせ</button>
+        </div>
+
+        <div id="res_msg" style="text-align: center; font-weight: bold; min-height: 1.5em; margin: 10px 0;"></div>
+
+        <div style="background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #f59e0b; margin-top: 15px;">
+            💡 <b>ときかたのヒント：</b><br>
+            (1) \(3 \times 2 = 6\) なので、分子は 6 になります。分母の 7 はそのままです。<br>
+            (2) 分数が先に来てもルールは同じ！ 分子の 3 に 2 をかけて 6 にしましょう。
+        </div>
+    </div>
+</div>
+
+<script>
+function checkEx(id, ansN, ansD) {
+    const n = document.getElementById('ex' + id + '_n');
+    const d = document.getElementById('ex' + id + '_d');
+    const msg = document.getElementById('res_msg');
+    if (parseInt(n.value) === ansN && parseInt(d.value) === ansD) {
+        n.classList.add('correct'); d.classList.add('correct');
+        msg.innerHTML = '<span style="color: #15803d;">正解です！分子にかけるのがポイントですね。</span>';
+    } else {
+        msg.innerHTML = '<span style="color: #dc2626;">分母はそのままで、分子にだけかけてみましょう。</span>';
+    }
+}
+</script>
+{% endblock %}

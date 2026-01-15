@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; }
+    
+    .example-card { background: white; border-radius: 15px; border: 2px solid #f59e0b; padding: 30px; }
+    .math-row { background: #fffbeb; padding: 25px; border-radius: 12px; margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 1.8em; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+    .answer-box { border: 2px solid #f59e0b; border-radius: 10px; width: 80px; height: 55px; text-align: center; font-size: 1em; font-weight: bold; outline: none; }
+    .answer-box.correct { border-color: #22c55e; background: #f0fdf4; color: #15803d; }
+    .check-btn { background: #f59e0b; color: white; border: none; border-radius: 20px; padding: 10px 30px; font-size: 0.6em; font-weight: bold; cursor: pointer; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #d97706;">MA07 帯分数と仮分数 【② 例題】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA07', page='intro') }}" class="step-item">① 導入</a>
+        <div class="step-item active">② 例題</div>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA07', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA07', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="example-card">
+        <h3>【例題】帯分数を仮分数になおしてみよう。</h3>
+
+        <div class="math-row">
+            <span>1</span>
+            <div class="fraction">
+                <span style="border-bottom: 2px solid #333;">3</span>
+                <span>4</span>
+            </div>
+            <span>＝</span>
+            <div class="fraction">
+                <input type="number" id="ex1_n" class="answer-box" placeholder="?">
+                <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                <input type="number" id="ex1_d" class="answer-box" placeholder="?">
+            </div>
+            <button class="check-btn" onclick="checkEx(1, 7, 4)">判定</button>
+        </div>
+
+        <div class="math-row">
+            <span>2</span>
+            <div class="fraction">
+                <span style="border-bottom: 2px solid #333;">1</span>
+                <span>5</span>
+            </div>
+            <span>＝</span>
+            <div class="fraction">
+                <input type="number" id="ex2_n" class="answer-box" placeholder="?">
+                <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                <input type="number" id="ex2_d" class="answer-box" placeholder="?">
+            </div>
+            <button class="check-btn" onclick="checkEx(2, 11, 5)">判定</button>
+        </div>
+
+        <div id="res_area" style="text-align: center; font-weight: bold; min-height: 1.5em;"></div>
+
+        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-top: 15px;">
+            💡 <b>ヒント：</b><br>
+            (1) \(1 \times 4 + 3 = 7\) なので、分子は 7 になります。<br>
+            (2) \(2 \times 5 + 1 = 11\) なので、分子は 11 になります。
+        </div>
+    </div>
+</div>
+
+<script>
+function checkEx(id, ansN, ansD) {
+    const n = document.getElementById('ex' + id + '_n');
+    const d = document.getElementById('ex' + id + '_d');
+    const res = document.getElementById('res_area');
+    if (parseInt(n.value) === ansN && parseInt(d.value) === ansD) {
+        n.classList.add('correct'); d.classList.add('correct');
+        res.innerHTML = '<span style="color: #15803d;">正解！その調子です。</span>';
+    } else {
+        res.innerHTML = '<span style="color: #dc2626;">もう一度計算してみよう。</span>';
+    }
+}
+</script>
+{% endblock %}

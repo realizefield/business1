@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item { width: 130px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-navigation .step-item.active { background-color: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    
+    .problem-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+    
+    /* 分数の表示構造 */
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 2.2em; }
+    .fraction-line { border-top: 3px solid #333; width: 100%; min-width: 50px; margin: 4px 0; }
+    
+    /* ヒント内の小さな分数 */
+    .hint-fraction { font-size: 1.1em; margin: 0 5px; }
+    .hint-line { border-top: 2px solid #333; min-width: 30px; margin: 2px 0; }
+
+    input[type="number"] { font-size: 30px; font-weight: 900; width: 90px; text-align: center; border: 2px solid #3b82f6; border-radius: 10px; height: 60px; }
+    
+    /* オレンジ点線枠のヒントボックス */
+    .hint-box { display: none; background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin-top: 15px; line-height: 1.8; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA02_3 約分 ② 【② 例題】</h1>
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='intro') }}" class="step-item">① 導入</a>
+        <div class="step-item active">② 例題</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <h3 style="margin-bottom: 20px;">〈例題〉 次の分数を約分しなさい。</h3>
+
+    <div class="problem-card">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span>(1)</span>
+            <span class="fraction"><span>12</span><div class="fraction-line"></div><span>18</span></span>
+            <span>＝</span>
+            <span class="fraction">
+                <span><input type="number" id="ex1_n"></span>
+                <div class="fraction-line"></div>
+                <span><input type="number" id="ex1_d"></span>
+            </span>
+            <button onclick="checkAnswer('ex1', 2, 3)" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">判定</button>
+            <button onclick="toggleHint('hint1')" style="padding: 10px; background: #f8fafc; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;">ヒント</button>
+        </div>
+        <div id="hint1" class="hint-box">
+            <strong>解き方：</strong> まず <strong>2</strong> でわると 
+            <div class="fraction hint-fraction"><span>6</span><div class="hint-line"></div><span>9</span></div> 
+            になるね。まだ <strong>3</strong> でわれるから... ➔ 
+            <div class="fraction hint-fraction"><span style="color: #dc2626;">2</span><div class="hint-line"></div><span style="color: #dc2626;">3</span></div> 
+            だよ！
+        </div>
+        <p id="ex1_res" style="margin-top: 10px; font-weight: bold;"></p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='drill') }}" class="btn" style="padding: 15px 80px; border-radius: 50px; background-color: #3b82f6; color: white; text-decoration: none; font-weight: bold; font-size: 1.2em; display: inline-block;">
+            ③ 演習へ進む ➔
+        </a>
+    </div>
+</div>
+
+<script>
+function checkAnswer(id, ansN, ansD) {
+    const n = document.getElementById(id + '_n').value;
+    const d = document.getElementById(id + '_d').value;
+    const res = document.getElementById(id + '_res');
+    if(n == ansN && d == ansD) {
+        res.innerHTML = "〇 正解！"; res.style.color = "#ef4444";
+    } else {
+        res.innerHTML = "× もう一回！"; res.style.color = "#3b82f6";
+    }
+}
+function toggleHint(id) {
+    const hint = document.getElementById(id);
+    hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endblock %}

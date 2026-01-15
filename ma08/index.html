@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>MA08　仮分数を帯分数にする</h1>
+
+<div class="section">
+  <div class="example-box">
+
+    <p>【例題】\(\dfrac{13}{5}\) を帯分数にしなさい。</p>
+
+    <p>
+      \(13 = 5 + 5 + 3\) なので  
+      \(\dfrac{13}{5}
+      = \dfrac{5 + 5 + 3}{5}
+      = \dfrac{5}{5} + \dfrac{5}{5} + \dfrac{3}{5}
+      = 1 + 1 + \dfrac{3}{5}
+      = 2 + \dfrac{3}{5}
+      = 2\dfrac{3}{5}\)
+    </p>
+
+    <p>→ このように計算するのは面倒です。つぎのようにします。</p>
+
+    <p>
+      \[
+      \begin{array}{c}
+        2 \\
+        \hline
+        5 ) 13 \\
+        10 \\
+        \hline
+        3
+      \end{array}
+      \ \ \rightarrow\ 2\dfrac{3}{5}
+      \]
+    </p>
+
+  </div>
+</div>
+
+<hr>
+
+<div class="section practice-box">
+  <p>【類題】次の仮分数を帯分数にしなさい。</p>
+
+  <p>
+    (1)\ \(\dfrac{21}{5} = 4\dfrac{1}{5}\)\　
+    (2)\ \(\dfrac{37}{7} = 5\dfrac{2}{7}\)\　
+    (3)\ \(\dfrac{58}{11} = 5\dfrac{3}{11}\)<br>
+    (4)\ \(\dfrac{29}{8} = 3\dfrac{5}{8}\)\　
+    (5)\ \(\dfrac{49}{6} = 8\dfrac{1}{6}\)\　
+    (6)\ \(\dfrac{83}{10} = 8\dfrac{3}{10}\)
+  </p>
+</div>
+
+<hr>
+
+<div class="section check-box">
+  <h3>【確認問題】</h3>
+
+  <p>
+    (1)\ \(\dfrac{46}{7} = 6\dfrac{4}{7}\)\　
+    (2)\ \(\dfrac{35}{6} = 5\dfrac{5}{6}\)
+  </p>
+</div>
+
+{% endblock %}

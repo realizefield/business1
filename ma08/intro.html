@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .page-container { max-width: 900px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #fae8ff; color: #701a75; border: 2px solid #d946ef; }
+    
+    .intro-card { background: white; border-radius: 15px; border: 2px solid #e2e8f0; padding: 35px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .intro-card h2 { color: #a21caf; border-left: 5px solid #d946ef; padding-left: 15px; margin-bottom: 20px; }
+
+    .point-box { background: #fdf4ff; border: 2px solid #d946ef; padding: 25px; border-radius: 12px; margin: 25px 0; }
+    .point-box h3 { color: #701a75; margin-top: 0; }
+    
+    .math-flex { display: inline-flex; align-items: center; font-size: 1.8em; font-weight: bold; gap: 10px; }
+    .fraction-inline { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.2; font-size: 0.9em; }
+    .fraction-inline span:first-child { border-bottom: 2px solid #333; padding: 0 8px; }
+    
+    .btn-next { display: inline-block; background: #d946ef; color: white; padding: 18px 60px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px #a21caf; transition: all 0.2s; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #a21caf; text-align: center; margin-bottom: 30px;">MA08 帯分数の計算 【① 導入】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="intro-card">
+        <h2>帯分数の計算は「仮分数」が味方！</h2>
+        <p style="font-size: 1.2em; line-height: 1.8; color: #4b5563;">
+            帯分数のままたし算やひき算をするのは、少しややこしいですね。<br>
+            でも、<b>一度「仮分数」になおしてしまえば</b>、今までの分数の計算とまったく同じやり方で解けます！
+        </p>
+
+        <div class="point-box">
+            <h3>✨ 計算の3ステップ</h3>
+            <ol style="font-size: 1.2em; line-height: 2;">
+                <li>帯分数を<b>仮分数</b>になおす！</li>
+                <li>分子どうしを<b>計算</b>する！</li>
+                <li>（もし必要なら）答えを帯分数に戻す。</li>
+            </ol>
+        </div>
+
+        <h3>やってみよう！</h3>
+        <p style="font-size: 1.1em;">例えば： \(1\frac{1}{4} + \frac{2}{4}\)</p>
+        
+        <div style="background: #f8fafc; padding: 20px; border-radius: 10px; text-align: center; border: 1px dashed #cbd5e1;">
+            <div class="math-flex">
+                1<div class="fraction-inline"><span>1</span><span>4</span></div> ＋ <div class="fraction-inline"><span>2</span><span>4</span></div>
+                ＝ <div class="fraction-inline"><span>5</span><span>4</span></div> ＋ <div class="fraction-inline"><span>2</span><span>4</span></div>
+                ＝ <div class="fraction-inline"><span>7</span><span>4</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA08', page='example') }}" class="btn-next">例題で練習する ➔</a>
+    </div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}

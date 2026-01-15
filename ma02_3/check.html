@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item { width: 130px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-navigation .step-item.active { background-color: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    
+    .problem-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+    
+    .fraction-container { display: inline-flex; align-items: center; gap: 10px; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+    .fraction-line { border-top: 3px solid #333; width: 100%; min-width: 60px; margin: 4px 0; }
+    
+    /* 入力欄 */
+    input[type="number"] { font-size: 28px; font-weight: 900; width: 85px; text-align: center; border: 2px solid #dc2626; border-radius: 10px; height: 55px; outline: none; }
+    input[readonly] { border-color: #22c55e !important; background-color: #f0fdf4 !important; color: #15803d !important; cursor: default; }
+
+    /* ヒント（オレンジ点線） */
+    .hint-box { display: none; background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin-top: 20px; font-size: 1.1em; line-height: 2.2; text-align: left; }
+    .hint-fraction { font-size: 0.9em; margin: 0 5px; line-height: 1.1; }
+    .hint-line { border-top: 2px solid #333; min-width: 25px; margin: 2px 0; }
+    .hint-btn { padding: 10px 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-weight: bold; color: #64748b; margin-left: auto; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA02_3 約分 ② 【④ 確認テスト】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='drill') }}" class="step-item">③ 演習</a>
+        <div class="step-item active">④ 確認</div>
+    </div>
+
+    {% if result %}
+    <div style="text-align: center; margin-bottom: 30px; padding: 25px; border-radius: 20px; background: {{ '#ecfdf5' if result.is_passed else '#fff1f2' }}; border: 4px solid {{ '#10b981' if result.is_passed else '#dc2626' }};">
+        <h2 style="font-size: 2em; color: {{ '#065f46' if result.is_passed else '#991b1b' }};">{{ result.total_count }}問中 {{ result.correct_count }} 問正解！</h2>
+        {% if result.is_passed %}
+            <p style="font-size: 1.4em; color: #059669; font-weight: bold; margin: 15px 0;">🎉 おめでとう！大きな数字の約分もマスターしましたね！</p>
+            <a href="{{ url_for('math_home') }}" class="btn" style="background: #10b981; color: white; padding: 15px 50px; border-radius: 50px; text-decoration: none; font-size: 1.2em; display: inline-block; font-weight: bold;">ホームへ戻る</a>
+        {% else %}
+            <p style="font-size: 1.1em; color: #dc2626; margin: 10px 0;">間違えたところを直して、もう一度「判定する」を押そう！</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <p style="font-size: 1.2em; margin-bottom: 25px; font-weight: bold; border-left: 6px solid #dc2626; padding-left: 15px;">
+        〈確認テスト〉 2回、3回とわって、最後まで小さくしましょう。
+    </p>
+
+    <form method="post">
+        {% for p in problems %}
+        <div class="problem-card">
+            <div class="fraction-container">
+                <span style="font-size: 1.5em; font-weight: bold; color: #64748b;">({{ loop.index }})</span>
+                
+                <div class="fraction" style="font-size: 2em;">
+                    <span>{{ p.n }}</span>
+                    <div class="fraction-line"></div>
+                    <span>{{ p.d }}</span>
+                </div>
+                
+                <span style="font-size: 2em; color: #94a3b8;">＝</span>
+
+                {% set u_n = request.form.get(p.id ~ '_n') %}
+                {% set u_d = request.form.get(p.id ~ '_d') %}
+                {% set is_correct = (u_n|int == p.ans_n and u_d|int == p.ans_d) if result else False %}
+
+                <div class="fraction">
+                    <span>
+                        <input type="number" name="{{ p.id }}_n" 
+                               value="{{ u_n if is_correct else '' }}" 
+                               {{ 'readonly' if is_correct else '' }} required>
+                    </span>
+                    <div class="fraction-line"></div>
+                    <span>
+                        <input type="number" name="{{ p.id }}_d" 
+                               value="{{ u_d if is_correct else '' }}" 
+                               {{ 'readonly' if is_correct else '' }} required>
+                    </span>
+                </div>
+
+                {% if result %}
+                <span style="font-size: 2.5em; margin-left: 10px; color: {{ '#ef4444' if is_correct else '#3b82f6' }};">
+                    {{ '〇' if is_correct else '×' }}
+                </span>
+                {% if not is_correct %}
+                <button type="button" class="hint-btn" onclick="toggleHint('hint{{ loop.index }}')">解き方</button>
+                {% endif %}
+                {% endif %}
+            </div>
+
+             <div id="hint{{ loop.index }}" class="hint-box">
+               <span style="color: #f59e0b; font-weight: bold;">💡 確認テストのヒント：</span><br>
+               {% if p.n == 30 and p.d == 45 %}
+                  まず <span style="color:#dc2626;">5</span> でわると <div class="fraction hint-fraction"><span>6</span><div class="hint-line"></div><span>9</span></div> になるね。さらに <span style="color:#dc2626;">3</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">2</span><div class="hint-line"></div><span style="color:#dc2626;">3</span></div> になるよ。
+               {% elif p.n == 36 and p.d == 48 %}
+                  まず <span style="color:#dc2626;">6</span> でわると <div class="fraction hint-fraction"><span>6</span><div class="hint-line"></div><span>8</span></div> になるね。さらに <span style="color:#dc2626;">2</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">3</span><div class="hint-line"></div><span style="color:#dc2626;">4</span></div> だよ。
+               {% elif p.n == 28 and p.d == 42 %}
+                  まず <span style="color:#dc2626;">2</span> でわると <div class="fraction hint-fraction"><span>14</span><div class="hint-line"></div><span>21</span></div>。さらに <span style="color:#dc2626;">7</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">2</span><div class="hint-line"></div><span style="color:#dc2626;">3</span></div> になるよ。
+               {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not result or not result.is_passed %}
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" style="padding: 18px 100px; border-radius: 50px; background-color: #dc2626; color: white; border: none; font-size: 1.5em; cursor: pointer; font-weight: bold; box-shadow: 0 4px #991b1b;">判定する</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function toggleHint(id) {
+    const hint = document.getElementById(id);
+    hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endblock %}

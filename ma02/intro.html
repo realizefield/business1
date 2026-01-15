@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* 進捗ボタン：全ページ共通でサイズを固定 */
+    .step-navigation .step-item {
+        width: 130px; height: 50px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 25px; font-weight: bold; text-decoration: none;
+        color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .step-navigation .step-item.active {
+        background-color: #dbeafe !important; color: #1e40af !important; border: 2px solid #3b82f6 !important;
+    }
+    .main-explanation { font-size: 1.3em; line-height: 1.8; color: #333; }
+    .point-box { background: #eff6ff; padding: 30px; border-radius: 15px; border-left: 8px solid #3b82f6; margin: 25px 0; }
+</style>
+
+<div class="page-container">
+    <h1>MA02 通分 【① 導入】</h1>
+
+    <div class="step-navigation" style="display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 30px;">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="section">
+        <h2 style="font-size: 1.6em; color: #1e40af;">「通分（つうぶん）」の魔法！</h2>
+        
+        <div class="point-box">
+            <p class="main-explanation">
+                分数は、<strong>「分母と分子に同じ数をかけても、全体の大きさは変わらない」</strong>という特別なルールがあります。
+            </p>
+            <p class="main-explanation" style="margin-top: 20px;">
+                たとえば、ピザを半分に分けた「$\frac{1}{2}$」と、さらに細かく4等分して2枚集めた「$\frac{2}{4}$」。<br>
+                見た目の数字は違いますが、<strong>お腹に入るピザの量は全く同じ</strong>ですよね？
+            </p>
+            <p class="main-explanation" style="margin-top: 20px; border-top: 2px dashed #3b82f6; padding-top: 20px;">
+                このように、分母を 2倍、3倍… と大きくするのに合わせて、分子も同じように 2倍、3倍… して、<strong>「大きさの等しい別の分数」</strong>を作ることを <strong>通分（つうぶん）</strong> と呼びます。
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02', page='example') }}" class="btn btn-primary" style="padding: 20px 80px; border-radius: 50px; text-decoration: none; font-weight: bold; background-color: #3b82f6; color: white; font-size: 1.3em;">② 例題でやり方をチェック →</a>
+    </div>
+</div>
+{% endblock %}

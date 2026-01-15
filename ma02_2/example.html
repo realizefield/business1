@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item {
+        width: 130px; height: 50px; display: flex; align-items: center; justify-content: center;
+        border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .step-navigation .step-item.active { background-color: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+
+    .problem-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; position: relative; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 2em; }
+    .fraction-line { border-top: 2px solid #333; width: 100%; min-width: 50px; margin: 3px 0; }
+    
+    input[type="number"] { font-size: 28px; font-weight: 900; width: 80px; text-align: center; border: 2px solid #3b82f6; border-radius: 8px; }
+    .hint-box { display: none; background: #fffbeb; border: 1px dashed #f59e0b; padding: 15px; border-radius: 10px; margin-top: 15px; }
+    .cancel-line { text-decoration: line-through; color: #999; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA02_2 約分 【② 例題】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='intro') }}" class="step-item">① 導入</a>
+        <div class="step-item active">② 例題</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <h3 style="margin-bottom: 20px;">〈例題〉 次の分数を約分しなさい。</h3>
+
+    <div class="problem-card">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span>(1)</span>
+            <span class="fraction"><span>3</span><div class="fraction-line"></div><span>12</span></span>
+            <span>＝</span>
+            <span class="fraction">
+                <span><input type="number" id="ex1_n"></span>
+                <div class="fraction-line"></div>
+                <span><input type="number" id="ex1_d"></span>
+            </span>
+            <button onclick="checkAnswer('ex1', 1, 4)" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">判定</button>
+            <button onclick="toggleHint('hint1')" style="padding: 10px; background: #f1f5f9; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;">ヒント</button>
+        </div>
+        <div id="hint1" class="hint-box">
+            <strong>解き方：</strong> 3と12は、どちらも <b>3</b> で割ることができます。<br>
+            3 ÷ 3 ＝ 1 ／ 12 ÷ 3 ＝ 4 ➔ <span class="fraction" style="font-size: 1.2em;"><span class="cancel-line">3</span><div style="border-top:1px solid #333"></div><span class="cancel-line">12</span></span> ＝ <span class="fraction" style="font-size: 1.2em;">1<div style="border-top:1px solid #333"></div>4</span>
+        </div>
+        <p id="ex1_res" style="margin-top: 10px; font-weight: bold;"></p>
+    </div>
+
+    <div class="problem-card">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span>(2)</span>
+            <span class="fraction"><span>10</span><div class="fraction-line"></div><span>15</span></span>
+            <span>＝</span>
+            <span class="fraction">
+                <span><input type="number" id="ex2_n"></span>
+                <div class="fraction-line"></div>
+                <span><input type="number" id="ex2_d"></span>
+            </span>
+            <button onclick="checkAnswer('ex2', 2, 3)" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">判定</button>
+            <button onclick="toggleHint('hint2')" style="padding: 10px; background: #f1f5f9; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;">ヒント</button>
+        </div>
+        <div id="hint2" class="hint-box">
+            <strong>解き方：</strong> 10と15は、どちらも <b>5</b> で割ることができます。<br>
+            10 ÷ 5 ＝ 2 ／ 15 ÷ 5 ＝ 3 ➔ <span class="fraction" style="font-size: 1.2em;">2<div style="border-top:1px solid #333"></div>3</span> になります。
+        </div>
+        <p id="ex2_res" style="margin-top: 10px; font-weight: bold;"></p>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='drill') }}" class="btn" style="padding: 15px 80px; border-radius: 50px; background-color: #3b82f6; color: white; text-decoration: none; font-weight: bold;">
+            ③ 演習へ進む ➔
+        </a>
+    </div>
+</div>
+
+<script>
+function checkAnswer(id, ansN, ansD) {
+    const n = document.getElementById(id + '_n').value;
+    const d = document.getElementById(id + '_d').value;
+    const res = document.getElementById(id + '_res');
+    if(n == ansN && d == ansD) {
+        res.innerHTML = "〇 正解！"; res.style.color = "#ef4444";
+    } else {
+        res.innerHTML = "× 残念！もう一度考えてみよう。"; res.style.color = "#3b82f6";
+    }
+}
+function toggleHint(id) {
+    const hint = document.getElementById(id);
+    hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* ナビゲーション */
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item { width: 130px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-navigation .step-item.active { background-color: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    
+    /* カードデザイン */
+    .problem-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; position: relative; }
+    
+    /* 分数の基本スタイル */
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 2.2em; }
+    .fraction-line { border-top: 3px solid #333; width: 100%; min-width: 50px; margin: 4px 0; }
+    
+    /* ヒント内の小さな分数（ここがポイント！） */
+    .hint-fraction { font-size: 1.1em; margin: 0 5px; line-height: 1.1; }
+    .hint-line { border-top: 2px solid #333; min-width: 25px; margin: 2px 0; }
+
+    input[type="number"] { font-size: 32px; font-weight: 900; width: 95px; text-align: center; border: 2px solid #3b82f6; border-radius: 10px; height: 65px; color: #1e40af; }
+    
+    /* ヒントボックス（オレンジ点線） */
+    .hint-box { display: none; background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin-top: 20px; font-size: 1.1em; line-height: 2.2; text-align: left; }
+    .hint-btn { padding: 10px 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-weight: bold; color: #64748b; margin-left: auto; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA02_3 約分 ② 【③ 演習】</h1>
+    
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='example') }}" class="step-item">② 例題</a>
+        <div class="step-item active">③ 演習</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <p style="font-size: 1.3em; margin-bottom: 30px; font-weight: bold; border-left: 6px solid #3b82f6; padding-left: 15px; color: #334155;">
+        〈演習〉 数字が大きいときは、2, 3, 5, 7 などの数で少しずつ割ってみましょう。
+    </p>
+
+    <form method="post">
+        {% for p in problems %}
+        <div class="problem-card">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <span style="font-size: 1.5em; font-weight: bold; color: #64748b;">({{ loop.index }})</span>
+                <span class="fraction"><span>{{ p.n }}</span><div class="fraction-line"></div><span>{{ p.d }}</span></span>
+                <span style="font-size: 2em; color: #94a3b8;">＝</span>
+                <span class="fraction">
+                    <span><input type="number" name="{{ p.id }}_n" required></span>
+                    <div class="fraction-line"></div>
+                    <span><input type="number" name="{{ p.id }}_d" required></span>
+                </span>
+                
+                <button type="button" class="hint-btn" onclick="toggleHint('hint{{ loop.index }}')">解き方のヒント</button>
+            </div>
+
+            <div id="hint{{ loop.index }}" class="hint-box">
+                <span style="color: #f59e0b; font-weight: bold;">💡 少しずつわってみよう：</span><br>
+                いきなり大きな数でわらなくても大丈夫！<br>
+                
+                {# 問題に応じた段階的なヒントの出し分け例 #}
+                {% if p.n == 45 and p.d == 60 %}
+                    たとえば、分子の {{ p.n }} と分母の {{ p.d }} を、まず <span style="font-weight:bold; color:#dc2626;">5</span> でわると
+                    <div class="fraction hint-fraction"><span>9</span><div class="hint-line"></div><span>12</span></div>
+                    になるね。<br>
+                    さらに、どちらも <span style="font-weight:bold; color:#dc2626;">3</span> でわると、答えは
+                    <div class="fraction hint-fraction"><span style="color:#dc2626;">3</span><div class="hint-line"></div><span style="color:#dc2626;">4</span></div>
+                    になるよ。
+                {% elif p.n == 24 and p.d == 36 %}
+                    まず <span style="font-weight:bold; color:#dc2626;">2</span> でわると
+                    <div class="fraction hint-fraction"><span>12</span><div class="hint-line"></div><span>18</span></div>
+                    になるね。<br>
+                    そこからさらに <span style="font-weight:bold; color:#dc2626;">6</span>（または2や3）でわっていくと、最後は
+                    <div class="fraction hint-fraction"><span style="color:#dc2626;">2</span><div class="hint-line"></div><span style="color:#dc2626;">3</span></div>
+                    になるよ。
+                {% else %}
+                    分子の {{ p.n }} と分母の {{ p.d }} を、2, 3, 5 などの小さな数で順番にわってみよう。<br>
+                    答えがこれ以上われない 
+                    <div class="fraction hint-fraction"><span style="color:#dc2626;">{{ p.ans_n }}</span><div class="hint-line"></div><span style="color:#dc2626;">{{ p.ans_d }}</span></div> 
+                    になるまで続けてね！
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="text-align: center; margin-top: 40px;">
+            <button type="submit" style="padding: 20px 120px; border-radius: 60px; background-color: #3b82f6; color: white; border: none; font-size: 1.6em; cursor: pointer; font-weight: bold; box-shadow: 0 5px #1d4ed8;">判定する</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleHint(id) {
+    const hint = document.getElementById(id);
+    hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endblock %}

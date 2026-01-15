@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .page-container { max-width: 900px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+    
+    .intro-card { background: white; border-radius: 15px; border: 2px solid #e2e8f0; padding: 35px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .intro-card h2 { color: #15803d; border-left: 5px solid #22c55e; padding-left: 15px; margin-bottom: 20px; }
+
+    .point-box { background: #f0fdf4; border: 2px solid #22c55e; padding: 25px; border-radius: 12px; margin: 25px 0; }
+    .point-box h3 { color: #166534; margin-top: 0; }
+    
+    .math-flex { display: inline-flex; align-items: center; font-size: 2em; font-weight: bold; gap: 10px; }
+    .fraction-inline { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.2; font-size: 0.9em; }
+    .fraction-inline span:first-child { border-bottom: 2px solid #333; padding: 0 8px; }
+
+    .btn-next { display: inline-block; background: #22c55e; color: white; padding: 18px 60px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px #15803d; transition: all 0.2s; }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px #15803d; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #15803d; text-align: center; margin-bottom: 30px;">MA09 整数 × 分数 【① 導入】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="intro-card">
+        <h2>整数は「分子」にだけかけよう！</h2>
+        <p style="font-size: 1.2em; line-height: 1.8; color: #4b5563;">
+            分数のたし算では分母は変えませんでしたね。かけ算も同じです！<br>
+            <b>整数をかけるときは、分子にだけかける</b>のがルールです。
+        </p>
+
+        <div class="point-box">
+            <h3>💡 計算のルール</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <div class="math-flex">
+                    2 × <div class="fraction-inline"><span>1</span><span>3</span></div>
+                    ＝ <div class="fraction-inline"><span>2 × 1</span><span>3</span></div>
+                    ＝ <div class="fraction-inline"><span>2</span><span>3</span></div>
+                </div>
+            </div>
+            <p style="text-align: center; font-weight: bold; color: #166534;">
+                分母はそのままで、分子だけを整数倍します！
+            </p>
+        </div>
+
+        <h3>なぜ分母はそのままなの？</h3>
+        <p style="font-size: 1.1em; line-height: 1.7;">
+            「\(\frac{1}{3}\) が 2つ分」と考えると、量は \(\frac{2}{3}\) になりますね。<br>
+            もし分母にも 2 をかけてしまうと、\(\frac{2}{6}\) になり、大きさは \(\frac{1}{3}\) と変わらなくなってしまいます。
+        </p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA09', page='example') }}" class="btn-next">例題で練習する ➔</a>
+    </div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}

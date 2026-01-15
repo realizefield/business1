@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* ナビゲーションと全体のレイアウト調整 */
+    .page-container { max-width: 900px; margin: 0 auto; padding: 20px; font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; }
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.3s; }
+    .step-item.active { background: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    
+    .intro-card { background: white; border-radius: 15px; border: 2px solid #e2e8f0; padding: 35px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .intro-card h2 { color: #1e293b; border-left: 5px solid #3b82f6; padding-left: 15px; margin-bottom: 20px; }
+
+    /* 変身ルールボックスの調整 */
+    .point-box { background: #eff6ff; border: 2px solid #3b82f6; padding: 25px; border-radius: 12px; margin: 25px 0; position: relative; }
+    .point-box h3 { color: #1e40af; margin-top: 0; display: flex; align-items: center; gap: 8px; }
+    
+    /* 分数表示の崩れを修正するスタイル */
+    .fraction-display-area { display: flex; align-items: center; justify-content: center; gap: 40px; margin: 20px 0; flex-wrap: wrap; }
+    .math-flex { display: inline-flex; align-items: center; font-size: 1.8em; font-weight: bold; }
+    .fraction-inline { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 8px; line-height: 1.2; }
+    .fraction-inline span:first-child { border-bottom: 2px solid #333; padding: 0 10px; }
+    .fraction-inline span:last-child { padding: 0 10px; }
+
+    .btn-next { display: inline-block; background: #3b82f6; color: white; padding: 18px 60px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2em; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px #1e40af; }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px #1e40af; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af; text-align: center; margin-bottom: 30px;">MA06 整数と分数の計算 【① 導入】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA06', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA06', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA06', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="intro-card">
+        <h2>整数はいつでも分数になれる！</h2>
+        <p style="font-size: 1.2em; line-height: 1.8; color: #475569;">
+            「2 ＋ \(\frac{1}{3}\)」のように、2以上の整数が出てきても考え方は同じです。<br>
+            <strong>すべての整数は、分母を 1 にした分数</strong>だと考えましょう。
+        </p>
+
+        <div class="point-box">
+            <h3>💡 整数の変身ルール</h3>
+            <div class="fraction-display-area">
+                <div class="math-flex">2 ＝ <div class="fraction-inline"><span>2</span><span>1</span></div></div>
+                <div class="math-flex">3 ＝ <div class="fraction-inline"><span>3</span><span>1</span></div></div>
+                <div class="math-flex">4 ＝ <div class="fraction-inline"><span>4</span><span>1</span></div></div>
+            </div>
+            <p style="font-size: 1.1em; margin-top: 15px; text-align: center; color: #1e40af; font-weight: bold;">
+                あとは、相手の分母に合わせて「通分」すれば計算できます！
+            </p>
+        </div>
+
+        <h3 style="margin-top: 30px;">通分のやりかた</h3>
+        <p style="font-size: 1.1em; line-height: 1.7;">
+            たとえば「2」を分母が <strong>3</strong> の分数にしたいときは、<br>
+            分母と分子の両方に 3 をかけて変身させます。
+        </p>
+        
+        <div style="background: #f8fafc; padding: 20px; border-radius: 10px; text-align: center; font-size: 1.5em; border: 1px dashed #cbd5e1; margin-top: 15px;">
+            <div class="math-flex">
+                2 ＝ <div class="fraction-inline"><span>2</span><span>1</span></div> 
+                ＝ <div class="fraction-inline"><span>2 × 3</span><span>1 × 3</span></div> 
+                ＝ <div class="fraction-inline"><span>6</span><span>3</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('learning_page', subject='math', unit_code='MA06', page='example') }}" class="btn-next">例題でやり方をチェック ➔</a>
+    </div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}

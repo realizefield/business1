@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* ナビゲーション */
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-item { width: 120px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-item.active { background: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+
+    /* 問題カードのコンテナ */
+    .problem-list-container { background: #f0f7ff; border: 2px solid #3b82f6; border-radius: 15px; padding: 20px; margin-top: 20px; }
+    .problem-card { display: flex; align-items: center; padding: 25px 0; border-bottom: 1px solid #e2e8f0; gap: 15px; flex-wrap: wrap; }
+    .problem-card:last-child { border-bottom: none; }
+
+    /* 分数の表示構造 */
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; min-width: 50px; }
+    .fraction-num { border-bottom: 2px solid #333; padding: 0 10px; font-size: 1.8em; }
+    .fraction-den { padding: 0 10px; font-size: 1.8em; }
+
+    /* 回答用入力欄（赤い枠） */
+    .answer-box { border: 2px solid #dc2626; border-radius: 10px; width: 85px; height: 55px; text-align: center; font-size: 1.8em; font-weight: bold; outline: none; }
+    .answer-box:focus { border-color: #3b82f6; box-shadow: 0 0 5px rgba(59,130,246,0.5); }
+
+    /* ヒントボックス */
+    .hint-box { display: none; width: 100%; background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin-top: 15px; line-height: 1.8; color: #92400e; }
+    .hint-btn { background: #f59e0b; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-weight: bold; cursor: pointer; margin-left: auto; }
+    
+    .btn-red { background: #dc2626; color: white; padding: 15px 100px; border-radius: 50px; border: none; font-size: 1.5em; font-weight: bold; cursor: pointer; margin-top: 40px; box-shadow: 0 4px #991b1b; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA03 分数をたす・ひく 【③ 演習】</h1>
+
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA03', page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA03', page='example') }}" class="step-item">② 例題</a>
+        <div class="step-item active">③ 演習</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA03', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div style="background: #eef2ff; border-left: 5px solid #3b82f6; padding: 15px; margin: 20px 0; font-weight: bold;">
+        【演習】 同じ分母のたし算・ひき算にちょうせんしよう！
+    </div>
+
+    <form method="post">
+        <div class="problem-list-container">
+            {% for p in problems %}
+            <div class="problem-card">
+                <span style="font-size: 1.2em; color: #64748b; min-width: 30px;">({{ loop.index }})</span>
+
+                <div class="fraction">
+                    <span class="fraction-num">{{ p.n1 }}</span>
+                    <span class="fraction-den">{{ p.d1 }}</span>
+                </div>
+
+                <span style="font-size: 2em; font-weight: bold;">{{ '＋' if p.type == 'add' else '－' }}</span>
+
+                <div class="fraction">
+                    <span class="fraction-num">{{ p.n2 }}</span>
+                    <span class="fraction-den">{{ p.d2 }}</span>
+                </div>
+
+                <span style="font-size: 2em; color: #94a3b8;">＝</span>
+
+                <div class="fraction">
+                    <input type="number" name="{{ p.id }}_n" class="answer-box" required>
+                    <div style="height: 2px; background: #333; width: 100%; margin: 4px 0;"></div>
+                    <input type="number" name="{{ p.id }}_d" class="answer-box" required>
+                </div>
+
+                <button type="button" class="hint-btn" onclick="toggleHint('hint{{ loop.index }}')">ヒント</button>
+
+                <div id="hint{{ loop.index }}" class="hint-box">
+                    <span style="font-weight: bold; color: #d97706;">💡 ヒント：</span><br>
+                    分母（下の数）は <span style="font-weight: bold; color: #dc2626;">{{ p.d1 }}</span> のまま書きましょう。<br>
+                    分子（上の数）だけを <b>{{ p.n1 }} {{ 'たす' if p.type == 'add' else 'ひく' }} {{ p.n2 }}</b> すれば正解だよ！
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn-red">判定する</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleHint(id) {
+    const hint = document.getElementById(id);
+    hint.style.display = (hint.style.display === "block") ? "none" : "block";
+}
+</script>
+{% endblock %}

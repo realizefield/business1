@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* 進捗ナビゲーション */
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item {
+        width: 130px !important; height: 50px !important; display: flex; align-items: center; justify-content: center;
+        border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .step-navigation .step-item.active { background-color: #dbeafe !important; color: #1e40af !important; border: 2px solid #3b82f6 !important; }
+
+    /* 約分のデザイン */
+    .intro-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 2.2; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 2.8em; margin: 0 10px; }
+    .fraction .num { border-bottom: 2px solid #333; padding: 0 5px; position: relative; }
+    
+    /* 斜線と赤い数字 */
+    .cancel-container { position: relative; display: inline-block; }
+    .cancel-line { text-decoration: line-through; color: #999; }
+    .small-num { position: absolute; font-size: 0.5em; color: #dc2626; font-weight: bold; }
+    .top-num { top: -20px; right: -25px; }
+    .bottom-num { bottom: -20px; right: -25px; }
+
+    /* 青い枠のメッセージ */
+    .blue-info-box {
+        border: 3px solid #3b82f6;
+        background-color: #f0f9ff;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 40px 0;
+        text-align: left;
+        font-size: 1.2em;
+    }
+    .red-bold { color: #dc2626; font-weight: bold; }
+</style>
+
+<div class="page-container">
+    <h1>MA02_2 約分（やくぶん） 【① 導入】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item active">① 導入</div>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='drill') }}" class="step-item">③ 演習</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='check') }}" class="step-item">④ 確認</a>
+    </div>
+
+    <div class="intro-box">
+        <p style="text-align: center; font-size: 1.3em;">
+            <span class="fraction"><span class="num">1</span><span>2</span></span> ＝ 
+            <span class="fraction"><span class="num">2</span><span>4</span></span> ＝ 
+            <span class="fraction"><span class="num">3</span><span>6</span></span> ……でしたね。
+        </p>
+
+        <div style="text-align: center; margin: 50px 0;">
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <span class="fraction">
+                    <span class="num">
+                        <span class="cancel-container">
+                            <span class="cancel-line">3</span><span class="small-num top-num">1</span>
+                        </span>
+                    </span>
+                    <span>
+                        <span class="cancel-container">
+                            <span class="cancel-line">6</span><span class="small-num bottom-num">2</span>
+                        </span>
+                    </span>
+                </span>
+                <span style="font-size: 2.5em; margin: 0 30px;">→</span>
+                <span class="fraction"><span class="num">1</span><span>2</span></span>
+            </div>
+            
+            <div class="blue-info-box">
+                分子と分母を共通して割れる<span class="red-bold">3</span>でそれぞれ割ると、<br>
+                大きな分数を<span class="red-bold">小さくする</span>ことができます。これを<span class="red-bold" style="font-size: 1.3em;">約分（やくぶん）</span>といいます。
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_2', page='example') }}" class="btn btn-primary" style="padding: 15px 80px; border-radius: 50px; background-color: #0ea5e9; color: white; text-decoration: none; font-weight: bold; font-size: 1.2em; display: inline-block;">
+            ② 例題へ進む ➔
+        </a>
+    </div>
+</div>
+{% endblock %}

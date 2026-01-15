@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-container">
+    <h1>MA01 分数の性質・通分 【確認テスト】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='intro') }}">① 導入</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='example') }}">② 例題</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='drill') }}">③ 演習</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item active">④ 確認</div>
+    </div>
+    
+    <p>空欄に数字を入れて「判定する」を押してください。判定後に各問題の解説が表示されます。</p>
+
+    <form method="post">
+        <div class="problem-box">
+            {% for p in problems %}
+            <div class="q-group" style="margin-bottom: 40px; padding: 20px; border-bottom: 2px solid #f0f0f0;">
+                <div style="font-size: 2.2em; display: flex; align-items: center;">
+                    <span style="font-size: 0.5em; color: #666; width: 45px;">({{ loop.index }})</span>
+                    <span class="fraction"><span class="num">{{ p.n }}</span><span class="den">{{ p.d }}</span></span>
+                    <span style="margin: 0 15px;">＝</span>
+                    <span class="fraction">
+                        <span class="num">
+                            <input type="number" name="{{ p.id }}" style="width: 90px; height: 60px; text-align: center; border: 3px solid #3b82f6; border-radius: 8px; font-size: 0.7em;" required>
+                        </span>
+                        <span class="den">{{ p.target_d }}</span>
+                    </span>
+
+                    <div style="margin-left: 35px; font-size: 0.4em;">
+                        <details>
+                            <summary style="cursor: pointer; color: #fff; background: #64748b; padding: 5px 12px; border-radius: 5px; list-style: none;">答表示</summary>
+                            <div style="margin-top: 10px; padding: 10px; border: 2px solid #ef4444; border-radius: 8px; background: #fff; text-align: center;">
+                                正解：<strong style="color: #ef4444; font-size: 1.5em;">{{ p.ans }}</strong>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                {% if result %}
+                <div class="individual-explanation" style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-left: 5px solid #3b82f6; border-radius: 4px; font-size: 1.1em;">
+                    <span style="color: #1d4ed8; font-weight: bold;">問({{ loop.index }})の解説：</span><br>
+                    分母を {{ p.d }} から {{ p.target_d }} へ <strong>{{ p.target_d // p.d }}倍</strong> しています。
+                    分子の {{ p.n }} も同じく <strong>{{ p.target_d // p.d }}倍</strong> するので、
+                    答えは <strong>{{ p.ans }}</strong> になります。
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="padding: 15px 80px; font-size: 1.2em; font-weight: bold; border-radius: 50px; background: #3b82f6; color: white; border: none; cursor: pointer;">判定する</button>
+        </div>
+    </form>
+
+    {% if result %}
+    <div style="margin-top: 30px; padding: 20px; text-align: center; background: #fff; border: 3px solid #3b82f6; border-radius: 15px;">
+        <h2 style="margin: 0;">合計点：<strong>{{ result.correct_count }} / {{ result.total_count }} 正解</strong></h2>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

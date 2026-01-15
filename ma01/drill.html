@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-container">
+    <h1>MA01 分数の性質・通分 【類題演習】</h1>
+
+    <div class="step-navigation">
+        <div class="step-item {{ 'active' if page == 'intro' }}"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='intro') }}">① 導入</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item {{ 'active' if page == 'example' }}"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='example') }}">② 例題</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item {{ 'active' if page == 'drill' }}"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='drill') }}">③ 演習</a></div>
+        <div class="step-divider"></div>
+        <div class="step-item {{ 'active' if page == 'check' }}"><a href="{{ url_for('math_unit_page', unit_code=unit_code, page='check') }}">④ 確認</a></div>
+    </div>
+
+    <p class="instruction" style="background: #eef2ff; padding: 15px; border-radius: 8px; border-left: 5px solid #3b82f6; margin-top: 20px;">
+        <strong>【問題】</strong> 空欄に数字を入れて解いてみましょう。右側の「答表示」で正解を確認できます。
+    </p>
+
+    <div class="problem-box">
+        {% for p in problems %}
+        <div class="q-row" style="margin-bottom: 40px; font-size: 1.8em; display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px;">
+            <span style="font-size: 0.6em; color: #666; width: 40px;">({{ loop.index }})</span>
+            
+            <span class="fraction"><span class="num">{{ p.n }}</span><span class="den">{{ p.d }}</span></span>
+            <span style="margin: 0 15px;">＝</span>
+            
+            <span class="fraction">
+                <span class="num">
+                    <input type="number" style="width: 70px; text-align: center; border: 2px solid #3b82f6; border-radius: 5px; font-size: 0.8em; background: #fff;">
+                </span>
+                <span class="den">{{ p.target_d }}</span>
+            </span>
+
+            <div style="margin-left: 40px; font-size: 0.5em;">
+                <details>
+                    <summary style="cursor: pointer; color: #fff; background: #3b82f6; padding: 5px 15px; border-radius: 20px; font-weight: bold; list-style: none;">答を表示</summary>
+                    <div style="margin-top: 10px; padding: 10px; border: 2px solid #ef4444; border-radius: 8px; background: #fff5f5; width: 250px;">
+                        正解：<strong style="color: #ef4444; font-size: 1.5em;">{{ p.ans }}</strong><br>
+                        <small style="color: #666;">（解説：分母を {{ p.d }} から {{ p.target_d }} へ {{ p.target_d // p.d }}倍 したので、分子の {{ p.n }} も {{ p.target_d // p.d }}倍 します）</small>
+                    </div>
+                </details>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="nav-buttons" style="margin-top: 40px; text-align: center;">
+        <a href="{{ url_for('math_unit_page', unit_code=unit_code, page='check') }}" class="btn btn-success" style="background: #22c55e; color: white; padding: 15px 50px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2em; display: inline-block;">
+            次は「④ 確認テスト」へ進む →
+        </a>
+    </div>
+</div>
+{% endblock %}

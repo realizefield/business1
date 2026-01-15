@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* スタイルは演習と同じ */
+    .step-navigation { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+    .step-navigation .step-item { width: 130px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-weight: bold; text-decoration: none; color: #666; background-color: #f8fafc; border: 1px solid #e2e8f0; }
+    .step-navigation .step-item.active { background-color: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    .problem-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+    .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 2em; }
+    .fraction-line { border-top: 3px solid #333; width: 100%; min-width: 60px; margin: 4px 0; }
+    input[type="number"] { font-size: 28px; font-weight: 900; width: 85px; text-align: center; border: 2px solid #dc2626; border-radius: 10px; height: 55px; outline: none; }
+    input[readonly] { border-color: #22c55e !important; background-color: #f0fdf4 !important; color: #15803d !important; cursor: default; }
+    .hint-box { display: none; background: #fffbeb; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin-top: 20px; font-size: 1.1em; line-height: 2.2; }
+    .hint-fraction { font-size: 0.9em; margin: 0 5px; line-height: 1.1; }
+    .hint-line { border-top: 2px solid #333; min-width: 25px; margin: 2px 0; }
+    .hint-btn { padding: 10px 20px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; cursor: pointer; font-weight: bold; color: #be123c; margin-left: auto; }
+</style>
+
+<div class="page-container">
+    <h1 style="color: #1e40af;">MA02_3 約分 ② 【④ 確認テスト】</h1>
+    <div class="step-navigation">
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='intro') }}" class="step-item">① 導入</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='example') }}" class="step-item">② 例題</a>
+        <a href="{{ url_for('math_unit_page', unit_code='MA02_3', page='drill') }}" class="step-item">③ 演習</a>
+        <div class="step-item active">④ 確認</div>
+    </div>
+
+    {% if result %}
+    <div style="text-align: center; margin-bottom: 30px; padding: 25px; border-radius: 20px; background: {{ '#ecfdf5' if result.is_passed else '#fff1f2' }}; border: 4px solid {{ '#10b981' if result.is_passed else '#dc2626' }};">
+        <h2 style="font-size: 2em;">{{ result.total_count }}問中 {{ result.correct_count }} 問正解！</h2>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% for p in problems %}
+        <div class="problem-card">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <span style="font-size: 1.5em; font-weight: bold;">({{ loop.index }})</span>
+                <div class="fraction"><span>{{ p.n }}</span><div class="fraction-line"></div><span>{{ p.d }}</span></div>
+                <span style="font-size: 2em; color: #94a3b8;">＝</span>
+
+                {% set u_n = request.form.get(p.id ~ '_n') %}
+                {% set u_d = request.form.get(p.id ~ '_d') %}
+                {% set is_correct = (u_n|int == p.ans_n and u_d|int == p.ans_d) if result else False %}
+
+                <div class="fraction">
+                    <span><input type="number" name="{{ p.id }}_n" value="{{ u_n if is_correct else '' }}" {{ 'readonly' if is_correct else '' }} required></span>
+                    <div class="fraction-line"></div>
+                    <span><input type="number" name="{{ p.id }}_d" value="{{ u_d if is_correct else '' }}" {{ 'readonly' if is_correct else '' }} required></span>
+                </div>
+
+                {% if result %}
+                    <span style="font-size: 2.5em; margin-left: 10px; color: {{ '#ef4444' if is_correct else '#3b82f6' }};">{{ '〇' if is_correct else '×' }}</span>
+                    {% if not is_correct %}<button type="button" class="hint-btn" onclick="toggleHint('hint{{ loop.index }}')">解き方</button>{% endif %}
+                {% endif %}
+            </div>
+
+            <div id="hint{{ loop.index }}" class="hint-box">
+                <span style="color: #f59e0b; font-weight: bold;">💡 ヒント：</span><br>
+                {% if "c1" in p.id %}
+                    まず <span style="color:#dc2626;">5</span> でわると <div class="fraction hint-fraction"><span>6</span><div class="hint-line"></div><span>9</span></div>。さらに <span style="color:#dc2626;">3</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">2</span><div class="hint-line"></div><span style="color:#dc2626;">3</span></div> になるよ。
+                {% elif "c2" in p.id %}
+                    まず <span style="color:#dc2626;">6</span> でわると <div class="fraction hint-fraction"><span>6</span><div class="hint-line"></div><span>8</span></div>。さらに <span style="color:#dc2626;">2</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">3</span><div class="hint-line"></div><span style="color:#dc2626;">4</span></div> だよ。
+                {% elif "c3" in p.id %}
+                    まず <span style="color:#dc2626;">2</span> でわると <div class="fraction hint-fraction"><span>14</span><div class="hint-line"></div><span>21</span></div>。さらに <span style="color:#dc2626;">7</span> でわると <div class="fraction hint-fraction"><span style="color:#dc2626;">2</span><div class="hint-line"></div><span style="color:#dc2626;">3</span></div> になるよ。
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% if not result or not result.is_passed %}<div style="text-align: center;"><button type="submit" style="padding: 15px 100px; background: #dc2626; color: white; border-radius: 50px; font-weight: bold; border: none; cursor: pointer;">判定する</button></div>{% endif %}
+    </form>
+</div>
+<script>function toggleHint(id){ var h = document.getElementById(id); h.style.display = (h.style.display === "block") ? "none" : "block"; }</script>
+{% endblock %}py
