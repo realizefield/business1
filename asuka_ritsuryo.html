@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飛鳥時代後半〜奈良時代：律令国家の完成</title>
+
+<style>
+  body{
+    font-family: "Meiryo", sans-serif;
+    max-width: 960px;
+    margin: 20px auto;
+    line-height: 1.8;
+    background-color: #f4f4f9;
+    font-size: 16px;
+    color:#222;
+    padding: 0 10px;
+  }
+  h1{ margin: 10px 0 6px 0; font-size: 26px; }
+  h2{ margin: 18px 0 8px 0; font-size: 20px; }
+
+  /* 到達バー */
+  .step-bar{
+    display:flex;
+    gap:8px;
+    margin: 14px 0 16px 0;
+    justify-content: space-between;
+  }
+  .step{
+    flex:1;
+    text-align:center;
+    padding: 8px 6px;
+    border-radius: 999px;
+    background:#ddd;
+    font-size: 13px;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+  }
+  .step::before{
+    content: attr(data-step);
+    display:inline-block;
+    width:18px; height:18px; line-height:18px;
+    border-radius:50%;
+    background:#aaa;
+    color:#fff;
+    font-size:12px;
+    margin-right:6px;
+    vertical-align:middle;
+  }
+  .step.active{ background:#e0f0ff; }
+  .step.done{ background:#b3e5fc; }
+  .step.done::before{ background:#0288d1; }
+
+  /* セクションカード */
+  .section{
+    display:none;
+    background:#fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+  }
+  .section.active{ display:block; }
+
+  .question-text{ margin-bottom: 12px; }
+
+  /* 空欄：淡い緑（縦をしっかり確保） */
+  .blank{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width: 140px;
+    min-height: 34px;         /* ←縦が短くなる問題対策 */
+    padding: 2px 10px;
+    margin: 0 4px;
+    border-radius: 8px;
+    border: 1px solid #98d6a6;
+    background: #eaffef;      /* 明るい淡い緑 */
+    font-weight: 700;
+    cursor: pointer;
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
+  .blank.correct{
+    background:#c7f2d3;
+    border-color:#2e7d32;
+  }
+
+  /* 読み（チャレンジ開始で消す） */
+  .reading{
+    color:#444;
+    margin-left: 4px;
+    font-size: 14px;
+  }
+  .hide-readings .reading{ display:none !important; }
+
+  /* POP（ボタン式） */
+  .pop-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ffb0b0;
+    background: #ffecec;
+    margin: 8px 0 10px 0;
+  }
+  .pop-title{
+    font-weight: 800;
+    color:#b30000;
+    font-size: 14px;
+  }
+  .pop-btn{
+    padding: 8px 12px;
+    border-radius: 10px;
+    border:none;
+    background:#ff6b6b;
+    color:#fff;
+    cursor:pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* 語群（下に固定） */
+  .word-bank-wrapper{
+    margin-top: 10px;
+    position: sticky;
+    bottom: 0;
+    background: #f4f4f9;
+    padding: 10px 0 12px 0;
+    border-top: 1px solid #ddd;
+  }
+  .word-bank-title{
+    font-weight:bold;
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    color:#222;
+  }
+  .word-bank{
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 64px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    background:#fafafa;
+  }
+  .word-chip{
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid #666;
+    background:#f5f5f5;
+    cursor:pointer;
+    user-select:none;
+    font-size: 14px;
+    font-weight:700;
+  }
+  .word-chip.used{ opacity:.35; cursor:default; }
+  .word-chip.selected-chip{
+    border-color:#1976d2;
+    background:#e3f2fd;
+    box-shadow: 0 0 0 2px #bbdefb;
+  }
+
+  /* 操作ボタン */
+  .controls{
+    margin-top: 10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  button{
+    padding: 9px 14px;
+    border-radius: 10px;
+    border:none;
+    background:#1976d2;
+    color:#fff;
+    cursor:pointer;
+    font-size: 15px;
+  }
+  button.secondary{ background:#666; }
+  button:disabled{ opacity:.5; cursor:default; }
+
+  .result-message{ margin-top: 6px; font-weight:bold; font-size: 14px; }
+  .timer-info{
+    margin-top: 8px;
+    padding: 8px 10px;
+    font-size: 15px;
+    color:#222;
+    border-radius: 8px;
+    border: 1px solid #1976d2;
+    background:#fff;
+    display:inline-block;
+  }
+  .explain-box{
+    margin-top: 10px;
+    padding: 10px;
+    border-left: 4px solid #1976d2;
+    background:#f0f4ff;
+    display:none;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  /* POPモーダル */
+  .popup-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 9999;
+    padding: 16px;
+  }
+  .popup-box{
+    background:#fff;
+    width: min(720px, 96vw);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+  .popup-title{ font-weight:900; margin-bottom: 8px; font-size: 16px; }
+  .popup-body{ font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
+  .popup-close{
+    margin-top: 12px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border:none;
+    background:#1976d2;
+    color:#fff;
+    cursor:pointer;
+    font-size: 14px;
+  }
+
+  /* 次の単元に行く：常に表示（右下固定） */
+  .next-unit-fixed{
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 9998;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border:none;
+    background:#2e7d32;
+    color:#fff;
+    font-weight: 900;
+    cursor:pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,.18);
+  }
+</style>
+</head>
+
+<body>
+<h1>🏛️ 飛鳥時代後半〜奈良時代：律令国家の完成</h1>
+
+<div class="step-bar">
+  <div class="step active" data-step="1">① 大化の改新</div>
+  <div class="step" data-step="2">② 白村江と国防</div>
+  <div class="step" data-step="3">③ 壬申の乱</div>
+  <div class="step" data-step="4">④ 律令国家完成</div>
+  <div class="step" data-step="5">⑤ 税と義務</div>
+</div>
+
+<!-- ① -->
+<div class="section active" data-section="1">
+  <h2>1. 大化の改新と公地公民の始まり</h2>
+
+  <div class="pop-row">
+    <div class="pop-title">pop1「大化の改新はなぜ起きたのか?」</div>
+    <button class="pop-btn" onclick="showPopup('pop1')">ポップを見る</button>
+  </div>
+
+  <div class="question-text">
+    645年、
+    <span class="blank" data-section="1" data-blank-id="A"></span><span class="reading">（なかのおおえのおうじ）</span>
+    と
+    <span class="blank" data-section="1" data-blank-id="B"></span><span class="reading">（なかとみのかまたり）</span>
+    は、独裁政治を行っていた蘇我入鹿を暗殺しました。これをきっかけに始まった大規模な政治改革を
+    <span class="blank" data-section="1" data-blank-id="C"></span>
+    といいます。<br><br>
+
+    <span class="blank" data-section="1" data-blank-id="D"></span>
+    の制：すべての豪族が支配していた土地や人々を朝廷（国）に返させました。<br><br>
+
+    <span class="blank" data-section="1" data-blank-id="E"></span>
+    ：6歳以上の男女に
+    <span class="blank" data-section="1" data-blank-id="F"></span><span class="reading">（くぶんでん）</span>
+    を貸し出し、死ねば国に返させる仕組みを作りました。<br><br>
+
+    その代わりに、人々は税として米の一部である
+    <span class="blank" data-section="1" data-blank-id="G"></span><span class="reading">（そ）</span>
+    を納める義務を負いました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="1">チャレンジ開始</button>
+    <button class="check-btn" data-section="1">判定</button>
+    <button class="secondary reset-btn" data-section="1">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="1">時間リセット</button>
+    <button class="next-section-btn" data-section="1" disabled>次の段落へ進む ▶</button>
+    <button class="secondary explain-btn" data-section="1">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-1"></div>
+  <div class="timer-info" id="timer-1">経過時間：---　（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-1">
+    <strong>【解説】</strong><br>
+    （必要なら後で追記できます。今は“原稿を正確に使う”を優先して、解説は最小にしています）
+  </div>
+
+  <div class="word-bank-wrapper">
+    <div class="word-bank-title">【語群】（チャレンジ開始で表示されます／語群は下に固定）</div>
+    <div class="word-bank" data-section="1"></div>
+  </div>
+</div>
+
+<!-- ② -->
+<div class="section" data-section="2">
+  <h2>2. 白村江の戦いと国防の強化</h2>
+
+  <div class="pop-row">
+    <div class="pop-title">pop2「白村江の戦いはどうして起きたのか?なせ日本は大敗したのか?」</div>
+    <button class="pop-btn" onclick="showPopup('pop2')">ポップを見る</button>
+  </div>
+
+  <div class="question-text">
+    660年、唐と新羅によって百済が滅ぼされると、日本は軍隊の援軍を求められました。
+    <span class="blank" data-section="2" data-blank-id="A"></span>
+    は豪族を寄せ集めた大軍を率いて戦いましたが、663年の
+    <span class="blank" data-section="2" data-blank-id="B"></span><span class="reading">（はくそんこうのたたかい）</span>
+    で惨敗しました。<br><br>
+
+    唐や新羅の襲来に備え、664年に九州警備の兵として
+    <span class="blank" data-section="2" data-blank-id="C"></span><span class="reading">（さきもり）</span>
+    を配備しました。<br><br>
+
+    その後、668年に皇子は
+    <span class="blank" data-section="2" data-blank-id="D"></span><span class="reading">（てんじてんのう）</span>
+    として即位しました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="2">チャレンジ開始</button>
+    <button class="check-btn" data-section="2">判定</button>
+    <button class="secondary reset-btn" data-section="2">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="2">時間リセット</button>
+    <button class="next-section-btn" data-section="2" disabled>次の段落へ進む ▶</button>
+    <button class="secondary explain-btn" data-section="2">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-2"></div>
+  <div class="timer-info" id="timer-2">経過時間：---　（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-2">
+    <strong>【解説】</strong><br>
+    （必要なら後で追記できます）
+  </div>
+
+  <div class="word-bank-wrapper">
+    <div class="word-bank-title">【語群】（チャレンジ開始で表示されます／語群は下に固定）</div>
+    <div class="word-bank" data-section="2"></div>
+  </div>
+</div>
+
+<!-- ③ -->
+<div class="section" data-section="3">
+  <h2>3. 壬申の乱と天皇への権力集中</h2>
+
+  <div class="pop-row">
+    <div class="pop-title">pop3「壬申の乱はどうして起きたのか?」</div>
+    <button class="pop-btn" onclick="showPopup('pop3')">ポップを見る</button>
+  </div>
+
+  <div class="pop-row">
+    <div class="pop-title">pop5「天武天皇と持統天皇によって「日本」という名がついた?」</div>
+    <button class="pop-btn" onclick="showPopup('pop5')">ポップを見る</button>
+  </div>
+
+  <div class="pop-row">
+    <div class="pop-title">pop6「伊勢神宮を作ったのはだれですか。」</div>
+    <button class="pop-btn" onclick="showPopup('pop6')">ポップを見る</button>
+  </div>
+
+  <div class="question-text">
+    <span class="blank" data-section="3" data-blank-id="A"></span>
+    が亡くなると、跡継ぎをめぐって子の
+    <span class="blank" data-section="3" data-blank-id="B"></span>
+    と弟の
+    <span class="blank" data-section="3" data-blank-id="C"></span><span class="reading">（おおあまのおうじ）</span>
+    が争う
+    <span class="blank" data-section="3" data-blank-id="D"></span><span class="reading">（672年）</span>
+    が起きました。有力豪族は
+    <span class="blank" data-section="3" data-blank-id="B2"></span>
+    を支援しましたが、
+    <span class="blank" data-section="3" data-blank-id="C2"></span>
+    が勝利しました。<br><br>
+
+    勝利した大海人皇子は、673年に
+    <span class="blank" data-section="3" data-blank-id="E"></span><span class="reading">（てんむてんのう）</span>
+    として即位し、天皇自ら政治を行う天皇親政によって権力を強めました。<br><br>
+
+    686年に天武天皇が亡くなると、その妻である
+    <span class="blank" data-section="3" data-blank-id="F"></span><span class="reading">（じとうてんのう）</span>
+    が即位しました。彼女は唐の都にならった
+    <span class="blank" data-section="3" data-blank-id="G"></span>
+    を建設し、国号を正式に日本と定めました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="3">チャレンジ開始</button>
+    <button class="check-btn" data-section="3">判定</button>
+    <button class="secondary reset-btn" data-section="3">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="3">時間リセット</button>
+    <button class="next-section-btn" data-section="3" disabled>次の段落へ進む ▶</button>
+    <button class="secondary explain-btn" data-section="3">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-3"></div>
+  <div class="timer-info" id="timer-3">経過時間：---　（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-3">
+    <strong>【解説】</strong><br>
+    （必要なら後で追記できます）
+  </div>
+
+  <div class="word-bank-wrapper">
+    <div class="word-bank-title">【語群】（チャレンジ開始で表示されます／語群は下に固定）</div>
+    <div class="word-bank" data-section="3"></div>
+  </div>
+</div>
+
+<!-- ④ -->
+<div class="section" data-section="4">
+  <h2>4. 律令国家の完成と全国支配</h2>
+
+  <div class="pop-row">
+    <div class="pop-title">pop4「大宝律令はなぜつくられたのか」</div>
+    <button class="pop-btn" onclick="showPopup('pop4')">ポップを見る</button>
+  </div>
+
+  <div class="question-text">
+    701年、藤原不比等（ふじわらのふひと）らが中心となり、唐の律令にならって日本の政治にマッチさせた
+    <span class="blank" data-section="4" data-blank-id="A"></span><span class="reading">（たいほうりつりょう）</span>
+    を制定しました。<br><br>
+
+    <span class="blank" data-section="4" data-blank-id="B"></span>
+    は刑罰の決まり、
+    <span class="blank" data-section="4" data-blank-id="C"></span>
+    は政治の決まりを指します。これにより、日本は法律に基づいて国を動かす
+    <span class="blank" data-section="4" data-blank-id="D"></span>
+    となりました。<br><br>
+
+    全国は国・郡・里に分けられ、各国の政治拠点として
+    <span class="blank" data-section="4" data-blank-id="E"></span><span class="reading">（こくふ）</span>
+    という役所が置かれました。<br><br>
+
+    都からは
+    <span class="blank" data-section="4" data-blank-id="F"></span><span class="reading">（こくし）</span>
+    と呼ばれる役人が各地の
+    <span class="blank" data-section="4" data-blank-id="E2"></span>
+    へ派遣され、政治を行いました。<br><br>
+
+    九州には、国防と外交の拠点として
+    <span class="blank" data-section="4" data-blank-id="G"></span><span class="reading">（だざいふ）</span>
+    が置かれました。<br><br>
+
+    東北には、朝廷の政治や軍事の拠点として
+    <span class="blank" data-section="4" data-blank-id="H"></span><span class="reading">（たがじょう）</span>
+    が置かれ、朝廷に従わない人々である
+    <span class="blank" data-section="4" data-blank-id="I"></span><span class="reading">（えみし）</span>
+    に備えました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="4">チャレンジ開始</button>
+    <button class="check-btn" data-section="4">判定</button>
+    <button class="secondary reset-btn" data-section="4">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="4">時間リセット</button>
+    <button class="next-section-btn" data-section="4" disabled>次の段落へ進む ▶</button>
+    <button class="secondary explain-btn" data-section="4">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-4"></div>
+  <div class="timer-info" id="timer-4">経過時間：---　（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-4">
+    <strong>【解説】</strong><br>
+    （必要なら後で追記できます）
+  </div>
+
+  <div class="word-bank-wrapper">
+    <div class="word-bank-title">【語群】（チャレンジ開始で表示されます／語群は下に固定）</div>
+    <div class="word-bank" data-section="4"></div>
+  </div>
+</div>
+
+<!-- ⑤ -->
+<div class="section" data-section="5">
+  <h2>5. 人々の重い負担（税と義務）</h2>
+
+  <div class="question-text">
+    律令制度のもと、一般の人々（良民）と奴隷（賤民）は区別され、戸籍に登録されました。<br><br>
+
+    <span class="blank" data-section="5" data-blank-id="A"></span><span class="reading">（そ）</span>
+    ：収穫した稲（米）の約3%を納める税です。<br><br>
+
+    <span class="blank" data-section="5" data-blank-id="B"></span><span class="reading">（ちょう）</span>
+    ：布や海産物などの特産物を都へ届ける税です。<br><br>
+
+    <span class="blank" data-section="5" data-blank-id="C"></span><span class="reading">（よう）</span>
+    ：都での労働の代わりに布を納める税です。<br><br>
+
+    <span class="blank" data-section="5" data-blank-id="D"></span><span class="reading">（ぞうよう）</span>
+    ：地方での土木工事などの労働で、年間60日以内とされました。<br><br>
+
+    <span class="blank" data-section="5" data-blank-id="E"></span><span class="reading">（へいえき）</span>
+    ：軍事の義務です。中央には衛士（えじ）、北九州には
+    <span class="blank" data-section="5" data-blank-id="F"></span>
+    が送られました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="5">チャレンジ開始</button>
+    <button class="check-btn" data-section="5">判定</button>
+    <button class="secondary reset-btn" data-section="5">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="5">時間リセット</button>
+    <button class="next-section-btn" data-section="5" disabled>クリア！</button>
+    <button class="secondary explain-btn" data-section="5">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-5"></div>
+  <div class="timer-info" id="timer-5">経過時間：---　（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-5">
+    <strong>【解説】</strong><br>
+    （必要なら後で追記できます）
+  </div>
+
+  <div class="word-bank-wrapper">
+    <div class="word-bank-title">【語群】（チャレンジ開始で表示されます／語群は下に固定）</div>
+    <div class="word-bank" data-section="5"></div>
+  </div>
+</div>
+
+<!-- POPモーダル -->
+<div id="popup-overlay" class="popup-overlay">
+  <div class="popup-box">
+    <div id="popup-title" class="popup-title"></div>
+    <div id="popup-body" class="popup-body"></div>
+    <button class="popup-close" onclick="hidePopup()">閉じる</button>
+  </div>
+</div>
+
+<!-- 次の単元（常に表示） -->
+<button class="next-unit-fixed" onclick="goNextUnit()">次の単元に行く ▶</button>
+
+<script>
+  // ===== POP（あなたの原文そのまま） =====
+  const POPUP_DATA = {
+    pop1: {
+      title: "pop1 「大化の改新はなぜ起きたのか?」",
+      body: "大化の改新が起きたのは、蘇我氏が百済との外交にこだわりすぎて国際情勢を見誤っていたこと, 蘇我入鹿（そがのいるか）は、天皇の宮殿を見下ろすことができる甘樫丘（あまかしのおか）に、巨大な邸宅を建てまた天皇を超える権力を持とうとしたことに、中大兄皇子たちが強い危機感を持ったからです。特定の豪族の支配を終わらせ、唐にならった新しい国づくりを目指しました。"
+    },
+    pop2: {
+      title: "pop2 「白村江の戦いはどうして起きたのか?なせ日本は大敗したのか?」",
+      body: "日本軍にとって新羅・唐軍は「未知の強敵」というよりは、「実力を正しく評価できていなかった強敵」でした。また日本軍豪族の寄せ集め軍隊でした。巨大な新羅・唐の艦隊に完敗しました。これにより中大兄皇子を「このままでは日本が滅ぼされる」という強い危機感に突き動かし、防人の配備や大宰府の設置といった急ピッチな国防強化、そして天皇中心の律令国家づくりへと繋がっていきました。"
+    },
+    pop3: {
+      title: "pop3 「壬申の乱はどうして起きたのか?」",
+      body: "天智天皇の死後、跡継ぎをめぐって息子の大友皇子と弟の大海人皇子（おおあまのおうじ）が激突した日本最大の内乱です。天智天皇の急進的な改革に不満を持つ地方豪族が大海人皇子を支持し、勝利へ導きました。結果、勝利した大海人皇子は天武天皇として即位し、有力豪族を抑えて天皇に権力を集中させる「天皇親政」を確立しました。これにより、日本が法律で動く律令国家（りつりょうこっか）へと進む道が決定づけられました。"
+    },
+    pop4: {
+      title: "pop4 「大宝律令はなぜつくられたのか」",
+      body: "天武天皇が目指した「天皇中心の国」という理想は、まだ法律として文章化されていませんでした。 その妻である持統天皇は、夫の死後、その理想を大宝律令という「目に見えるルールブック」として完成させることで、天皇の地位を揺るぎないものにしようとしました。また、唐にならった高度な法を持つことで、日本が一人前の「文明国」であることを外国に示す狙いもありました。"
+    },
+    pop5: {
+      title: "pop5 「天武天皇と持統天皇によって「日本」という名がついた?」",
+      body: "それまで日本は中国などから「倭（わ）」と呼ばれていました。天武天皇は、天皇の権威を高めるために「日の昇るもと」を意味する「日本」という新しい名前を考え出したとされています。 実際にこの名前が公式なルール（大宝律令）として決まり、外国に対して正式に使い始めたのは、天武天皇の意志を引き継いだ持統天皇の時代です。"
+    },
+    pop6: {
+      title: "pop6「伊勢神宮を作ったのはだれですか。」",
+      body: "天武天皇は「壬申の乱」の際、伊勢の神（天照大神）に向かって勝利を祈り、実際に見事勝利しました。このため、伊勢神宮を「国で一番大切な神社」として特別視するようになりました。 夫の遺志を継いだ持統天皇は、20年に一度社殿を建て替える「式年遷宮（しきねんせんぐう）」という制度を690年に初めて行いました。これにより、伊勢神宮は永遠に新しく、神聖な場所として守られる仕組みが完成しました。"
+    }
+  };
+
+  function showPopup(key){
+    const data = POPUP_DATA[key];
+    if(!data) return;
+    document.getElementById("popup-title").textContent = data.title;
+    document.getElementById("popup-body").textContent = data.body;
+    document.getElementById("popup-overlay").style.display = "flex";
+  }
+  function hidePopup(){
+    document.getElementById("popup-overlay").style.display = "none";
+  }
+
+  // 次の単元：ここだけURLを変えればOK
+  const NEXT_UNIT_URL = "/history/home"; // ←必要に応じて変更してください
+  function goNextUnit(){
+    window.location.href = NEXT_UNIT_URL;
+  }
+
+  // ===== 段落データ =====
+  const sectionData = {
+    1: {
+      answers: {
+        A:"中大兄皇子",
+        B:"中臣鎌足",
+        C:"大化の改新",
+        D:"公地公民",
+        E:"班田収授の法",
+        F:"口分田",
+        G:"租"
+      },
+      choices: [
+        "中大兄皇子","中臣鎌足","大化の改新","公地公民","班田収授の法","口分田","租"
+      ]
+    },
+    2: {
+      answers: {
+        A:"中大兄皇子",
+        B:"白村江の戦い",
+        C:"防人",
+        D:"天智天皇"
+      },
+      choices: [
+        "中大兄皇子","白村江の戦い","防人","天智天皇"
+      ]
+    },
+    3: {
+      answers: {
+        A:"天智天皇",
+        B:"大友皇子",
+        C:"大海人皇子",
+        D:"壬申の乱",
+        B2:"大友皇子",
+        C2:"大海人皇子",
+        E:"天武天皇",
+        F:"持統天皇",
+        G:"藤原京"
+      },
+      choices: [
+        "天智天皇","大友皇子","大海人皇子","壬申の乱","天武天皇","持統天皇","藤原京"
+      ]
+    },
+    4: {
+      answers: {
+        A:"大宝律令",
+        B:"律",
+        C:"令",
+        D:"律令国家",
+        E:"国府",
+        E2:"国府",
+        F:"国司",
+        G:"大宰府",
+        H:"多賀城",
+        I:"蝦夷"
+      },
+      choices: [
+        "大宝律令","律","令","律令国家","国府","国司","大宰府","多賀城","蝦夷"
+      ]
+    },
+    5: {
+      answers: {
+        A:"租",
+        B:"調",
+        C:"庸",
+        D:"雑徭",
+        E:"兵役",
+        F:"防人"
+      },
+      choices: [
+        "租","調","庸","雑徭","兵役","防人"
+      ]
+    }
+  };
+
+  // ===== 共通ロジック（鎌倉GAMBA互換） =====
+  const sectionStates = {
+    1:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    2:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    3:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    4:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    5:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+  };
+
+  let selectedChip = null;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function clearSelectedChip(){
+    if(selectedChip){
+      selectedChip.classList.remove("selected-chip");
+      selectedChip = null;
+    }
+  }
+
+  function handleChipClick(chip){
+    if(chip.classList.contains("used")) return;
+    if(selectedChip === chip){
+      chip.classList.remove("selected-chip");
+      selectedChip = null;
+    }else{
+      clearSelectedChip();
+      selectedChip = chip;
+      chip.classList.add("selected-chip");
+    }
+  }
+
+  function renderWordBank(section){
+    const bank = document.querySelector(`.word-bank[data-section="${section}"]`);
+    if(!bank) return;
+    bank.innerHTML = "";
+    const data = sectionData[section];
+    const shuffled = shuffle(data.choices);
+    shuffled.forEach(word=>{
+      const chip = document.createElement("div");
+      chip.className = "word-chip";
+      chip.textContent = word;
+      chip.dataset.word = word;
+      chip.dataset.section = section;
+      chip.addEventListener("click", ()=>handleChipClick(chip));
+      bank.appendChild(chip);
+    });
+  }
+
+  // 最初は答え入り（あらすじ）で表示
+  function prefillAnswers(section){
+    const data = sectionData[section];
+    const blanks = document.querySelectorAll(`.blank[data-section="${section}"]`);
+    blanks.forEach(blank=>{
+      const id = blank.dataset.blankId;
+      const correct = data.answers[id];
+      if(correct){
+        blank.textContent = correct;
+        blank.dataset.word = correct;
+        blank.classList.remove("correct");
+      }
+    });
+  }
+
+  function setupBlanks(){
+    document.querySelectorAll(".blank").forEach(blank=>{
+      blank.dataset.word = blank.dataset.word || "";
+      blank.addEventListener("click", ()=>{
+        const sec = Number(blank.dataset.section);
+        const currentWord = blank.dataset.word || "";
+
+        // 選択中の語群がある → 入れる
+        if(selectedChip){
+          const chipSection = Number(selectedChip.dataset.section);
+          const chipWord = selectedChip.dataset.word;
+          if(chipSection !== sec) return;
+
+          // 既に入っている語を戻す
+          if(currentWord){
+            const oldChip = document.querySelector(`.word-chip[data-section="${sec}"][data-word="${currentWord}"]`);
+            if(oldChip) oldChip.classList.remove("used");
+          }
+
+          blank.textContent = chipWord;
+          blank.dataset.word = chipWord;
+          blank.classList.remove("correct");
+
+          selectedChip.classList.add("used");
+          selectedChip.classList.remove("selected-chip");
+          selectedChip = null;
+          return;
+        }
+
+        // 選択中なし → 入っている語を戻して空に
+        if(currentWord){
+          const chip = document.querySelector(`.word-chip[data-section="${sec}"][data-word="${currentWord}"]`);
+          if(chip) chip.classList.remove("used");
+          blank.textContent = "";
+          blank.dataset.word = "";
+          blank.classList.remove("correct");
+        }
+      });
+    });
+  }
+
+  function formatElapsed(sec){
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+  }
+
+  function updateTimerDisplay(section, runningSec=null){
+    const el = document.getElementById(`timer-${section}`);
+    const state = sectionStates[section];
+    let line1 = "";
+    if(runningSec != null) line1 = "経過時間：" + formatElapsed(runningSec);
+    else if(state.timerRunning && state.startTime){
+      const elapsed = Math.floor((Date.now()-state.startTime)/1000);
+      line1 = "経過時間：" + formatElapsed(elapsed);
+    }else{
+      line1 = "経過時間：---";
+    }
+
+    let line2 = "";
+    if(state.attempts.length===0) line2 = "（まだ記録がありません）";
+    else{
+      const parts = state.attempts.map((sec,idx)=>`${idx+1}回目：${sec}秒`);
+      line2 = "（記録：" + parts.join(" ／ ") + "）";
+    }
+    el.textContent = line1 + "　" + line2;
+  }
+
+  function startTimer(section){
+    const state = sectionStates[section];
+    if(state.intervalId){ clearInterval(state.intervalId); state.intervalId=null; }
+    state.startTime = Date.now();
+    state.timerRunning = true;
+    updateTimerDisplay(section,0);
+    state.intervalId = setInterval(()=>{
+      const elapsed = Math.floor((Date.now()-state.startTime)/1000);
+      updateTimerDisplay(section, elapsed);
+    }, 1000);
+  }
+
+  function stopTimerAndRecord(section){
+    const state = sectionStates[section];
+    if(!state.timerRunning || !state.startTime) return;
+    const elapsed = Math.floor((Date.now()-state.startTime)/1000);
+    state.timerRunning = false;
+    state.startTime = null;
+    if(state.intervalId){ clearInterval(state.intervalId); state.intervalId=null; }
+    state.attempts.push(elapsed);
+    updateTimerDisplay(section);
+  }
+
+  function resetTimes(section){
+    const state = sectionStates[section];
+    state.attempts = [];
+    state.timerRunning = false;
+    state.startTime = null;
+    if(state.intervalId){ clearInterval(state.intervalId); state.intervalId=null; }
+    updateTimerDisplay(section);
+  }
+
+  function resetSection(section){
+    document.querySelectorAll(`.blank[data-section="${section}"]`).forEach(b=>{
+      b.textContent = "";
+      b.dataset.word = "";
+      b.classList.remove("correct");
+    });
+    const bank = document.querySelector(`.word-bank[data-section="${section}"]`);
+    if(bank) bank.innerHTML = "";
+    clearSelectedChip();
+    const resultEl = document.getElementById(`result-${section}`);
+    if(resultEl) resultEl.textContent = "";
+    // 読みを再表示（あらすじモードに戻す）
+    document.body.classList.remove("hide-readings");
+    prefillAnswers(section);
+  }
+
+  function checkSection(section){
+    const data = sectionData[section];
+    const blanks = document.querySelectorAll(`.blank[data-section="${section}"]`);
+    let allCorrect = true;
+
+    blanks.forEach(blank=>{
+      const id = blank.dataset.blankId;
+      const userWord = blank.dataset.word || "";
+      const correct = data.answers[id];
+
+      if(!userWord){ allCorrect=false; blank.classList.remove("correct"); return; }
+
+      if(userWord === correct){
+        blank.classList.add("correct");
+      }else{
+        allCorrect = false;
+        blank.classList.remove("correct");
+
+        // 間違い語は語群へ戻す
+        const chip = document.querySelector(`.word-chip[data-section="${section}"][data-word="${userWord}"]`);
+        if(chip) chip.classList.remove("used");
+
+        blank.textContent = "";
+        blank.dataset.word = "";
+      }
+    });
+
+    const resultEl = document.getElementById(`result-${section}`);
+    if(allCorrect){
+      resultEl.textContent = "合格おめでとう！";
+      handleClearSection(section);
+    }else{
+      resultEl.textContent = "まだ間違いがあります。もう一度チャレンジしてみよう。";
+    }
+  }
+
+  function handleClearSection(section){
+    stopTimerAndRecord(section);
+    sectionStates[section].cleared = true;
+
+    const stepEl = document.querySelector(`.step[data-step="${section}"]`);
+    if(stepEl) stepEl.classList.add("done");
+
+    const nextBtn = document.querySelector(`.next-section-btn[data-section="${section}"]`);
+    if(nextBtn) nextBtn.disabled = false;
+  }
+
+  function goToSection(section){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    const target = document.querySelector(`.section[data-section="${section}"]`);
+    if(target) target.classList.add("active");
+
+    document.querySelectorAll(".step").forEach((st,idx)=>{
+      st.classList.toggle("active", (idx+1)===section);
+    });
+  }
+
+  function toggleExplain(section){
+    const box = document.getElementById(`explain-${section}`);
+    if(!box) return;
+    box.style.display = (box.style.display==="none" || box.style.display==="") ? "block" : "none";
+  }
+
+  window.addEventListener("DOMContentLoaded", ()=>{
+    // 最初は答え入り表示
+    for(let s=1;s<=5;s++){
+      prefillAnswers(s);
+      updateTimerDisplay(s);
+    }
+    setupBlanks();
+
+    // チャレンジ開始：空欄にして語群表示、読みを消す
+    document.querySelectorAll(".start-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+
+        // 読みを消す
+        document.body.classList.add("hide-readings");
+
+        document.querySelectorAll(`.blank[data-section="${section}"]`).forEach(b=>{
+          b.textContent = "";
+          b.dataset.word = "";
+          b.classList.remove("correct");
+        });
+
+        renderWordBank(section);
+        const resultEl = document.getElementById(`result-${section}`);
+        if(resultEl) resultEl.textContent = "";
+        clearSelectedChip();
+        startTimer(section);
+      });
+    });
+
+    document.querySelectorAll(".check-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+        checkSection(section);
+      });
+    });
+
+    document.querySelectorAll(".reset-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+        resetSection(section);
+      });
+    });
+
+    document.querySelectorAll(".time-reset-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+        resetTimes(section);
+      });
+    });
+
+    document.querySelectorAll(".next-section-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+        const next = section + 1;
+        if(next <= 5) goToSection(next);
+        else alert("5つの段落をすべてクリアしました！おつかれさま！");
+      });
+    });
+
+    document.querySelectorAll(".explain-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const section = Number(btn.dataset.section);
+        toggleExplain(section);
+      });
+    });
+
+    // ①〜⑤どこでも移動
+    document.querySelectorAll(".step").forEach((stepEl, index)=>{
+      stepEl.addEventListener("click", ()=>{
+        goToSection(index+1);
+      });
+    });
+  });
+</script>
+</body>
+</html>

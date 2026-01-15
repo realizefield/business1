@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>奈良時代：聖武天皇の時代から崩壊へ（GAMBA）</title>
+<style>
+  body{
+    font-family:"Meiryo", sans-serif;
+    max-width:960px;
+    margin:16px auto;
+    line-height:1.85;
+    background:#f4f4f9;
+    font-size:16px;
+    padding:0 10px 140px; /* 下の固定語群の分の余白 */
+  }
+  h1{ margin: 8px 0 6px; }
+  h2{ margin: 16px 0 8px; font-size:20px; }
+
+  /* 到達バー（どこからでもクリックOK） */
+  .step-bar{
+    display:flex; gap:8px;
+    margin:12px 0 14px;
+    justify-content:space-between;
+  }
+  .step{
+    flex:1;
+    text-align:center;
+    padding:7px 4px;
+    border-radius:999px;
+    background:#ddd;
+    font-size:13px;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+  }
+  .step::before{
+    content: attr(data-step);
+    display:inline-block;
+    width:18px;height:18px;line-height:18px;
+    border-radius:50%;
+    background:#aaa;color:#fff;
+    font-size:12px;
+    margin-right:4px;
+  }
+  .step.active{ background:#e0f0ff; }
+  .step.done{ background:#b3e5fc; }
+  .step.done::before{ background:#0288d1; }
+
+  /* カード */
+  .section{
+    display:none;
+    background:#fff;
+    border-radius:10px;
+    padding:14px 16px;
+    border:1px solid #cfcfcf;
+    margin-bottom:16px;
+  }
+  .section.active{ display:block; }
+
+  /* 空欄（淡い緑の背景） */
+  .blank{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:110px;
+    min-height:34px;          /* ← 縦が短くならないように */
+    padding:3px 10px;
+    margin:0 4px;
+    border-radius:8px;
+    border:1px solid #7cbf7c;
+    background:#e9f8e9;       /* 淡い緑 */
+    vertical-align:middle;
+    cursor:pointer;
+    user-select:none;
+    font-weight:700;
+    box-sizing:border-box;
+  }
+  .blank.correct{
+    background:#cfe9ff;
+    border-color:#2f6fb2;
+  }
+
+  .reading{
+    color:#666;
+    font-size:0.92em;
+    margin-left:2px;
+    white-space:nowrap;
+  }
+  /* チャレンジ中は読みを消す（JSで .challenge-mode を付けます） */
+  .challenge-mode .reading{ display:none; }
+
+  .question-text{ margin-bottom:12px; }
+
+  /* 下に固定する語群エリア */
+  .sticky-bank{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    background:#ffffff;
+    border-top:2px solid #1976d2;
+    box-shadow:0 -6px 16px rgba(0,0,0,0.12);
+    z-index:9998;
+  }
+  .sticky-inner{
+    max-width:960px;
+    margin:0 auto;
+    padding:10px 10px 12px;
+  }
+  .word-bank-title{
+    font-weight:700;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-size:14px;
+  }
+  .bank-hint{ color:#555; font-weight:500; font-size:12px; }
+  .word-bank{
+    border:1px solid #cfcfcf;
+    border-radius:10px;
+    padding:10px;
+    min-height:56px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    background:#fafafa;
+  }
+  .word-chip{
+    padding:9px 12px;
+    border-radius:18px;
+    border:1px solid #666;
+    background:#f5f5f5;
+    cursor:pointer;
+    user-select:none;
+    font-size:14px;
+  }
+  .word-chip.used{ opacity:0.38; cursor:default; }
+  .word-chip.selected-chip{
+    border-color:#1976d2;
+    background:#e3f2fd;
+    box-shadow:0 0 0 2px #bbdefb;
+  }
+
+  .controls{
+    margin-top:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  button{
+    padding:8px 14px;
+    border-radius:9px;
+    border:none;
+    background:#1976d2;
+    color:#fff;
+    cursor:pointer;
+    font-size:15px;
+  }
+  button.secondary{ background:#666; }
+  button:disabled{ opacity:0.5; cursor:default; }
+
+  .result-message{
+    margin-top:6px;
+    font-weight:800;
+    font-size:14px;
+  }
+  .timer-info{
+    margin-top:8px;
+    padding:8px 12px;
+    font-size:16px;          /* 文字を大きめ */
+    border-radius:8px;
+    border:1px solid #1976d2;
+    background:#fff;
+    display:inline-block;
+  }
+
+  .explain-box{
+    margin-top:10px;
+    padding:10px 10px;
+    border-left:4px solid #1976d2;
+    background:#f0f4ff;
+    display:none;
+    font-size:14px;
+    border-radius:6px;
+  }
+
+  /* 常に出す：次の単元へ */
+  .next-unit-fixed{
+    position:fixed;
+    right:12px;
+    bottom:118px; /* 語群固定より上 */
+    z-index:9999;
+  }
+  .next-unit-fixed a{
+    display:inline-block;
+    padding:10px 14px;
+    border-radius:999px;
+    background:#00a152;
+    color:#fff;
+    text-decoration:none;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(0,0,0,0.18);
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🏛️ 奈良時代：聖武天皇の時代から崩壊へ（文化と社会）</h1>
+
+<div class="step-bar">
+  <div class="step active" data-step="1">① 平城京・東大寺</div>
+  <div class="step" data-step="2">② 墾田永年私財法</div>
+  <div class="step" data-step="3">③ 天平文化・遣唐使</div>
+  <div class="step" data-step="4">④ 正倉院・シルクロード</div>
+  <div class="step" data-step="5">⑤ 歴史書・万葉集</div>
+</div>
+
+<!-- ① 平城京の遷都と東大寺 -->
+<div class="section active" data-section="1">
+  <h2>6. 平城京の遷都と東大寺の建立</h2>
+  <div class="question-text">
+    710年、
+    <span class="blank" data-section="1" data-blank-id="A"></span>
+    から
+    <span class="blank" data-section="1" data-blank-id="B"></span>
+    へ都を移しました。唐の都
+    <span class="blank" data-section="1" data-blank-id="C"></span>
+    を模した都です。<br>
+
+    ・
+    <span class="blank" data-section="1" data-blank-id="D"></span>
+    ：唐にならって発行された銅貨です。<br>
+
+    ・
+    <span class="blank" data-section="1" data-blank-id="E"></span>天皇の政治：
+    災害や疫病から国を守るため、仏教の力に頼りました。<br>
+
+    ・
+    <span class="blank" data-section="1" data-blank-id="F"></span>・
+    <span class="blank" data-section="1" data-blank-id="G"></span>・
+    <span class="blank" data-section="1" data-blank-id="H"></span>：
+    平城京に東大寺、全国に国分寺・国分尼寺を建てました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="1">チャレンジ開始</button>
+    <button class="check-btn" data-section="1">判定</button>
+    <button class="secondary reset-btn" data-section="1">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="1">時間リセット</button>
+    <button class="next-section-btn" data-section="1" disabled>次へ ▶</button>
+    <button class="secondary explain-btn" data-section="1">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-1"></div>
+  <div class="timer-info" id="timer-1">経過時間：---（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-1">
+    <strong>【解説】</strong><br>
+    平城京は唐の長安を参考にした都で、和同開珎なども発行されました。聖武天皇は災害や疫病に対して仏教の力で国を守ろうとし、東大寺や国分寺・国分尼寺を建てました。
+  </div>
+</div>
+
+<!-- ② 墾田永年私財法 -->
+<div class="section" data-section="2">
+  <h2>7. 墾田永年私財法と班田収授の崩壊</h2>
+  <div class="question-text">
+    人口が増え
+    <span class="blank" data-section="2" data-blank-id="A"></span>
+    が不足したため、743年に
+    <span class="blank" data-section="2" data-blank-id="B"></span>
+    が出されました。<br>
+
+    ・
+    <span class="blank" data-section="2" data-blank-id="B2"></span>
+    ：新しく開墾した土地を「永久に自分のものにしてよい」と認める法律です。<br>
+
+    ・
+    <span class="blank" data-section="2" data-blank-id="C"></span>
+    の発生：
+    豊かな貴族や寺社が農民を雇って自分の土地を増やし、荘園と呼ばれる私有地が広がりました。これにより、国の土地を貸し出す
+    <span class="blank" data-section="2" data-blank-id="D"></span>
+    の仕組みは次第に崩れていきました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="2">チャレンジ開始</button>
+    <button class="check-btn" data-section="2">判定</button>
+    <button class="secondary reset-btn" data-section="2">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="2">時間リセット</button>
+    <button class="next-section-btn" data-section="2" disabled>次へ ▶</button>
+    <button class="secondary explain-btn" data-section="2">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-2"></div>
+  <div class="timer-info" id="timer-2">経過時間：---（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-2">
+    <strong>【解説】</strong><br>
+    口分田が不足すると、墾田永年私財法で開墾地の私有が認められ、荘園が増えました。その結果、班田収授のしくみは崩れていきました。
+  </div>
+</div>
+
+<!-- ③ 天平文化と唐との交流 -->
+<div class="section" data-section="3">
+  <h2>🌸 奈良時代の文化と社会の広がり：1. 天平文化と唐との交流</h2>
+  <div class="question-text">
+    奈良時代の文化を
+    <span class="blank" data-section="3" data-blank-id="A"></span>
+    文化（てんぴょうぶんか）といいます。唐の優れた文化を吸収するため、
+    <span class="blank" data-section="3" data-blank-id="B"></span>
+    <span class="reading">（けんとうし）</span>
+    が多く派遣されました。<br>
+
+    ・
+    <span class="blank" data-section="3" data-blank-id="C"></span>
+    （あべのなかまろ）：唐の役人として活躍しましたが、日本に帰国できなかった遣唐使です。<br>
+
+    ・
+    <span class="blank" data-section="3" data-blank-id="D"></span>
+    （がんじん）：日本に正しい戒律を伝えるため、5回も渡航に失敗し失明しながらも来日した唐の高僧です。彼は
+    <span class="blank" data-section="3" data-blank-id="E"></span>
+    （とうしょうだいじ）を建てました。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="3">チャレンジ開始</button>
+    <button class="check-btn" data-section="3">判定</button>
+    <button class="secondary reset-btn" data-section="3">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="3">時間リセット</button>
+    <button class="next-section-btn" data-section="3" disabled>次へ ▶</button>
+    <button class="secondary explain-btn" data-section="3">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-3"></div>
+  <div class="timer-info" id="timer-3">経過時間：---（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-3">
+    <strong>【解説】</strong><br>
+    天平文化は唐の影響が強く、遣唐使を通して多くの制度・文化が伝わりました。阿倍仲麻呂や鑑真が有名です。
+  </div>
+</div>
+
+<!-- ④ 正倉院とシルクロード -->
+<div class="section" data-section="4">
+  <h2>2. 聖武天皇の宝物とシルクロード</h2>
+  <div class="question-text">
+    東大寺の倉庫である
+    <span class="blank" data-section="4" data-blank-id="A"></span>
+    （しょうそういん）には、聖武天皇の愛用品などが収められています。<br>
+
+    ・
+    <span class="blank" data-section="4" data-blank-id="B"></span>
+    （あぜくらづくり）：湿気を管理する工夫が凝らされた建築様式です。<br>
+
+    ・
+    <span class="blank" data-section="4" data-blank-id="C"></span>
+    ：ペルシャの「みずさし」や「五弦の琵琶」など、
+    シルクロードを経由して運ばれた国際色豊かな宝物が見られます。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="4">チャレンジ開始</button>
+    <button class="check-btn" data-section="4">判定</button>
+    <button class="secondary reset-btn" data-section="4">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="4">時間リセット</button>
+    <button class="next-section-btn" data-section="4" disabled>次へ ▶</button>
+    <button class="secondary explain-btn" data-section="4">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-4"></div>
+  <div class="timer-info" id="timer-4">経過時間：---（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-4">
+    <strong>【解説】</strong><br>
+    正倉院にはシルクロード由来の宝物もあり、国際交流の広がりが分かります。校倉造は湿気対策の工夫です。
+  </div>
+</div>
+
+<!-- ⑤ 歴史書と万葉集 -->
+<div class="section" data-section="5">
+  <h2>3. 歴史書と万葉集</h2>
+  <div class="question-text">
+    この時代、国の成り立ちや文化を記録する書物が次々とまとめられました。<br>
+
+    ・
+    <span class="blank" data-section="5" data-blank-id="A"></span>
+    ・
+    <span class="blank" data-section="5" data-blank-id="B"></span>
+    ：天皇家の歴史や神話をまとめた歴史書です。<br>
+
+    ・
+    <span class="blank" data-section="5" data-blank-id="C"></span>
+    （ふどき）：各地の産物や伝説を記録した地理本です。<br>
+
+    ・
+    <span class="blank" data-section="5" data-blank-id="D"></span>
+    ：日本最古の歌集で、漢字の音や訓で日本語を表す
+    <span class="blank" data-section="5" data-blank-id="E"></span>
+    が使われました。
+    <span class="blank" data-section="5" data-blank-id="F"></span>
+    （やまのうえのおくら）が農民の苦しさを詠んだ「
+    <span class="blank" data-section="5" data-blank-id="G"></span>
+    」が有名です。
+  </div>
+
+  <div class="controls">
+    <button class="start-btn" data-section="5">チャレンジ開始</button>
+    <button class="check-btn" data-section="5">判定</button>
+    <button class="secondary reset-btn" data-section="5">この段落をやり直す</button>
+    <button class="secondary time-reset-btn" data-section="5">時間リセット</button>
+    <button class="next-section-btn" data-section="5" disabled>クリア！</button>
+    <button class="secondary explain-btn" data-section="5">【解説】を見る</button>
+  </div>
+
+  <div class="result-message" id="result-5"></div>
+  <div class="timer-info" id="timer-5">経過時間：---（まだ記録がありません）</div>
+
+  <div class="explain-box" id="explain-5">
+    <strong>【解説】</strong><br>
+    古事記・日本書紀で国家の正統性を示し、風土記で地域情報をまとめ、万葉集では万葉がなによる表記が使われました。山上憶良の貧窮問答歌が有名です。
+  </div>
+</div>
+
+<!-- 常に出す：次の単元へ（リンクはあとで差し替えOK） -->
+<div class="next-unit-fixed">
+  <!-- 例：次の単元を作ったら href を /history/gamba/xxxx に変更してください -->
+  <a href="/history/gamba/next_unit">次の単元に行く ▶</a>
+</div>
+
+<!-- 下に固定する語群（現在の段落の語群だけ表示） -->
+<div class="sticky-bank" id="stickyBank">
+  <div class="sticky-inner">
+    <div class="word-bank-title">
+      <span>【語群】（チャレンジ開始を押すと、ここに語句が出ます）</span>
+      <span class="bank-hint">※語句をタップ → 空欄をタップ</span>
+    </div>
+    <div class="word-bank" id="activeWordBank"></div>
+  </div>
+</div>
+
+<script>
+  // どの段落が表示中か
+  let currentSection = 1;
+
+  // 各段落の答えと語群（必要語句だけに絞っています）
+  const sectionData = {
+    1: {
+      answers: {
+        A:"藤原京", B:"平城京", C:"長安", D:"和同開珎",
+        E:"聖武", F:"東大寺", G:"国分寺", H:"国分尼寺"
+      },
+      choices: ["藤原京","平城京","長安","和同開珎","聖武","東大寺","国分寺","国分尼寺"]
+    },
+    2: {
+      answers: { A:"口分田", B:"墾田永年私財法", B2:"墾田永年私財法", C:"荘園", D:"班田収授" },
+      choices: ["口分田","墾田永年私財法","荘園","班田収授"]
+    },
+    3: {
+      answers: { A:"天平", B:"遣唐使", C:"阿倍仲麻呂", D:"鑑真", E:"唐招提寺" },
+      choices: ["天平","遣唐使","阿倍仲麻呂","鑑真","唐招提寺"]
+    },
+    4: {
+      answers: { A:"正倉院", B:"校倉造", C:"シルクロード" },
+      choices: ["正倉院","校倉造","シルクロード"]
+    },
+    5: {
+      answers: {
+        A:"古事記", B:"日本書紀", C:"風土記", D:"万葉集",
+        E:"万葉がな", F:"山上憶良", G:"貧窮問答歌"
+      },
+      choices: ["古事記","日本書紀","風土記","万葉集","万葉がな","山上憶良","貧窮問答歌"]
+    }
+  };
+
+  // タイマー状態
+  const sectionStates = {
+    1:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    2:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    3:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    4:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false },
+    5:{ attempts:[], timerRunning:false, startTime:null, intervalId:null, cleared:false }
+  };
+
+  // 語群チップ選択
+  let selectedChip = null;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function clearSelectedChip(){
+    if(selectedChip){
+      selectedChip.classList.remove("selected-chip");
+      selectedChip = null;
+    }
+  }
+
+  function handleChipClick(chip){
+    if(chip.classList.contains("used")) return;
+    if(selectedChip === chip){
+      chip.classList.remove("selected-chip");
+      selectedChip = null;
+    }else{
+      clearSelectedChip();
+      selectedChip = chip;
+      chip.classList.add("selected-chip");
+    }
+  }
+
+  // 現在の段落の語群だけ表示
+  function renderWordBank(section){
+    const bank = document.getElementById("activeWordBank");
+    bank.innerHTML = "";
+    const data = sectionData[section];
+    if(!data) return;
+
+    const shuffled = shuffle(data.choices);
+    shuffled.forEach(word=>{
+      const chip = document.createElement("div");
+      chip.className = "word-chip";
+      chip.textContent = word;
+      chip.dataset.word = word;
+      chip.dataset.section = section;
+      chip.addEventListener("click", ()=>handleChipClick(chip));
+      bank.appendChild(chip);
+    });
+  }
+
+  // あらすじ表示：最初は答えを入れる
+  function prefillAnswers(section){
+    const data = sectionData[section];
+    if(!data) return;
+    document.querySelectorAll(`.blank[data-section="${section}"]`).forEach(blank=>{
+      const id = blank.dataset.blankId;
+      const correct = data.answers[id];
+      if(correct){
+        blank.textContent = correct;
+        blank.dataset.word = correct;
+        blank.classList.remove("correct");
+      }
+    });
+  }
+
+  // 空欄クリック：選択語を入れる／戻す
+  function setupBlanks(){
+    document.querySelectorAll(".blank").forEach(blank=>{
+      blank.dataset.word = blank.dataset.word || "";
+      blank.addEventListener("click", ()=>{
+        const blankSection = Number(blank.dataset.section);
+        const currentWord = blank.dataset.word || "";
+
+        // 違う段落の空欄は触らない（表示中のみ）
+        if(blankSection !== currentSection) return;
+
+        // チップ選択中 → 入れる
+        if(selectedChip){
+          const chipSection = Number(selectedChip.dataset.section);
+          if(chipSection !== blankSection) return;
+
+          // 既に入ってた語を戻す
+          if(currentWord){
+            const oldChip = document.querySelector(`.word-chip[data-section="${blankSection}"][data-word="${currentWord}"]`);
+            if(oldChip) oldChip.classList.remove("used");
+          }
+
+          const chipWord = selectedChip.dataset.word;
+          blank.textContent = chipWord;
+          blank.dataset.word = chipWord;
+          blank.classList.remove("correct");
+
+          selectedChip.classList.add("used");
+          selectedChip.classList.remove("selected-chip");
+          selectedChip = null;
+          return;
+        }
+
+        // 選択なし → 空欄の語を戻す
+        if(currentWord){
+          const chip = document.querySelector(`.word-chip[data-section="${blankSection}"][data-word="${currentWord}"]`);
+          if(chip) chip.classList.remove("used");
+          blank.textContent = "";
+          blank.dataset.word = "";
+          blank.classList.remove("correct");
+        }
+      });
+    });
+  }
+
+  function formatElapsed(sec){
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
+
+  function updateTimerDisplay(section, runningSec=null){
+    const el = document.getElementById(`timer-${section}`);
+    const st = sectionStates[section];
+    let line1 = "経過時間：---";
+    if(runningSec!=null) line1 = "経過時間：" + formatElapsed(runningSec);
+    let line2 = "";
+    if(st.attempts.length===0) line2 = "（まだ記録がありません）";
+    else line2 = "（記録：" + st.attempts.map((sec,i)=>`${i+1}回目：${sec}秒`).join(" ／ ") + "）";
+    el.textContent = line1 + "　" + line2;
+  }
+
+  function startTimer(section){
+    const st = sectionStates[section];
+    if(st.intervalId){ clearInterval(st.intervalId); st.intervalId=null; }
+    st.startTime = Date.now();
+    st.timerRunning = true;
+    updateTimerDisplay(section,0);
+    st.intervalId = setInterval(()=>{
+      const elapsed = Math.floor((Date.now()-st.startTime)/1000);
+      updateTimerDisplay(section, elapsed);
+    },1000);
+  }
+
+  function stopTimerAndRecord(section){
+    const st = sectionStates[section];
+    if(!st.timerRunning || !st.startTime) return;
+    const elapsed = Math.floor((Date.now()-st.startTime)/1000);
+    st.timerRunning = false;
+    st.startTime = null;
+    if(st.intervalId){ clearInterval(st.intervalId); st.intervalId=null; }
+    st.attempts.push(elapsed);
+    updateTimerDisplay(section);
+  }
+
+  function resetTimes(section){
+    const st = sectionStates[section];
+    st.attempts = [];
+    st.timerRunning = false;
+    st.startTime = null;
+    if(st.intervalId){ clearInterval(st.intervalId); st.intervalId=null; }
+    updateTimerDisplay(section);
+  }
+
+  function resetSection(section){
+    // 空欄クリア → あらすじ表示に戻す
+    document.querySelectorAll(`.blank[data-section="${section}"]`).forEach(b=>{
+      b.textContent = "";
+      b.dataset.word = "";
+      b.classList.remove("correct");
+    });
+    const resultEl = document.getElementById(`result-${section}`);
+    if(resultEl) resultEl.textContent = "";
+    clearSelectedChip();
+    prefillAnswers(section);
+    // 読みを戻す（summary）
+    document.querySelector(`.section[data-section="${section}"]`)?.classList.remove("challenge-mode");
+  }
+
+  function checkSection(section){
+    const data = sectionData[section];
+    const blanks = document.querySelectorAll(`.blank[data-section="${section}"]`);
+    let allCorrect = true;
+
+    blanks.forEach(blank=>{
+      const id = blank.dataset.blankId;
+      const userWord = blank.dataset.word || "";
+      const correct = data.answers[id];
+
+      if(!userWord){
+        allCorrect = false;
+        blank.classList.remove("correct");
+        return;
+      }
+      if(userWord === correct){
+        blank.classList.add("correct");
+      }else{
+        allCorrect = false;
+        blank.classList.remove("correct");
+
+        // 間違った語は語群に戻す
+        const chip = document.querySelector(`.word-chip[data-section="${section}"][data-word="${userWord}"]`);
+        if(chip) chip.classList.remove("used");
+
+        blank.textContent = "";
+        blank.dataset.word = "";
+      }
+    });
+
+    const resultEl = document.getElementById(`result-${section}`);
+    if(allCorrect){
+      resultEl.textContent = "合格おめでとう！";
+      handleClearSection(section);
+    }else{
+      resultEl.textContent = "まだ間違いがあります。もう一度チャレンジしてみよう。";
+    }
+  }
+
+  function handleClearSection(section){
+    stopTimerAndRecord(section);
+    sectionStates[section].cleared = true;
+
+    const stepEl = document.querySelector(`.step[data-step="${section}"]`);
+    if(stepEl) stepEl.classList.add("done");
+
+    const nextBtn = document.querySelector(`.next-section-btn[data-section="${section}"]`);
+    if(nextBtn) nextBtn.disabled = false;
+  }
+
+  function goToSection(section){
+    currentSection = section;
+
+    document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
+    document.querySelector(`.section[data-section="${section}"]`)?.classList.add("active");
+
+    document.querySelectorAll(".step").forEach((st,idx)=>{
+      st.classList.remove("active");
+      if(idx+1===section) st.classList.add("active");
+    });
+
+    // 表示段落の語群に切り替え（未チャレンジなら空のまま）
+    const bank = document.getElementById("activeWordBank");
+    bank.innerHTML = "";
+    clearSelectedChip();
+  }
+
+  function toggleExplain(section){
+    const box = document.getElementById(`explain-${section}`);
+    if(!box) return;
+    box.style.display = (box.style.display==="none" || box.style.display==="") ? "block" : "none";
+  }
+
+  function startChallenge(section){
+    // 読みを消す
+    document.querySelector(`.section[data-section="${section}"]`)?.classList.add("challenge-mode");
+
+    // 空欄を空にする
+    document.querySelectorAll(`.blank[data-section="${section}"]`).forEach(b=>{
+      b.textContent = "";
+      b.dataset.word = "";
+      b.classList.remove("correct");
+    });
+
+    // 語群表示
+    renderWordBank(section);
+
+    const resultEl = document.getElementById(`result-${section}`);
+    if(resultEl) resultEl.textContent = "";
+    clearSelectedChip();
+    startTimer(section);
+  }
+
+  window.addEventListener("DOMContentLoaded", ()=>{
+    // 最初は全段落「あらすじ（答え入り）」でOK
+    for(let s=1;s<=5;s++){
+      prefillAnswers(s);
+      updateTimerDisplay(s);
+    }
+    setupBlanks();
+
+    document.querySelectorAll(".start-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        if(s !== currentSection) goToSection(s);
+        startChallenge(s);
+      });
+    });
+
+    document.querySelectorAll(".check-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        checkSection(s);
+      });
+    });
+
+    document.querySelectorAll(".reset-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        resetSection(s);
+      });
+    });
+
+    document.querySelectorAll(".time-reset-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        resetTimes(s);
+      });
+    });
+
+    document.querySelectorAll(".next-section-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        const next = s + 1;
+        if(next <= 5) goToSection(next);
+        else alert("5つの段落をすべてクリアしました！おつかれさま！");
+      });
+    });
+
+    document.querySelectorAll(".explain-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const s = Number(btn.dataset.section);
+        toggleExplain(s);
+      });
+    });
+
+    // ①〜⑤どこからでも
+    document.querySelectorAll(".step").forEach((stepEl, idx)=>{
+      stepEl.addEventListener("click", ()=>{
+        goToSection(idx+1);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

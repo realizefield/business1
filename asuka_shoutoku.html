@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>飛鳥時代：聖徳太子の国づくり</title>
+  <style>
+    body{
+      font-family:"Meiryo", sans-serif;
+      max-width:960px;
+      margin:20px auto;
+      line-height:1.8;
+      background:#f4f4f9;
+      font-size:16px;
+      padding-bottom:170px; /* 固定語群の高さ確保 */
+    }
+    h1{ margin-bottom:8px; }
+    h2{ margin-top:18px; margin-bottom:8px; font-size:20px; }
+
+    /* 到達バー */
+    .step-bar{
+      display:flex; gap:8px; margin:16px 0 20px 0; justify-content:space-between;
+    }
+    .step{
+      flex:1; text-align:center; padding:6px 4px; border-radius:999px;
+      background:#ddd; font-size:13px; cursor:pointer; position:relative; user-select:none;
+    }
+    .step::before{
+      content: attr(data-step);
+      display:inline-block; width:18px; height:18px; line-height:18px;
+      border-radius:50%; background:#aaa; color:#fff; font-size:12px; margin-right:4px;
+    }
+    .step.active{ background:#e0f0ff; }
+    .step.done{ background:#b3e5fc; }
+    .step.done::before{ background:#0288d1; }
+
+    /* セクションカード */
+    .section{
+      display:none;
+      background:#fff;
+      border-radius:8px;
+      padding:14px 16px;
+      border:1px solid #ccc;
+      margin-bottom:16px;
+    }
+    .section.active{ display:block; }
+
+    /* 空欄デザイン */
+    .blank{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      min-height: 34px;
+      padding: 2px 12px;
+      box-sizing: border-box;
+      border-radius: 8px;
+      border: 1px solid #9ad3a2;
+      background: #e9f8ec;
+      margin: 0 4px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+    }
+    .blank.correct {
+      border-color: #4caf50;
+      background: #c8e6c9;
+    }
+
+    /* ふりがな */
+    .reading{ color:#444; margin-left:2px; }
+    .challenge-mode .reading{ display:none; }
+
+    /* popライン */
+    .pop-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #ffb0b0;
+      background:#ffecec;
+      margin:10px 0 14px 0;
+    }
+    .pop-title{ font-weight:bold; color:#b30000; font-size:14px; }
+    .pop-btn{
+      padding:7px 12px;
+      border-radius:10px;
+      border:none;
+      background:#ff6b6b;
+      color:#fff;
+      cursor:pointer;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .pop-btn:hover{ filter:brightness(0.98); }
+
+    /* ボタン列 */
+    .controls{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    button{
+      padding:8px 14px;
+      border-radius:8px;
+      border:none;
+      background:#1976d2;
+      color:#fff;
+      cursor:pointer;
+      font-size:15px;
+    }
+    button.secondary{ background:#666; }
+    button:disabled{ opacity:0.5; cursor:default; }
+
+    .result-message{ margin-top:6px; font-weight:bold; font-size:14px; }
+
+    .timer-info{
+      margin-top:8px;
+      padding:6px 10px;
+      font-size:15px;
+      color:#222;
+      border-radius:6px;
+      border:1px solid #1976d2;
+      background:#fff;
+      display:inline-block;
+    }
+
+    .explain-box{
+      margin-top:10px;
+      padding:8px;
+      border-left:4px solid #1976d2;
+      background:#f0f4ff;
+      display:none;
+      font-size:14px;
+    }
+
+    /* 固定語群 */
+    .wordbank-fixed{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      background:#f4f4f9;
+      border-top:1px solid #ccc;
+      padding:10px 0;
+      z-index:9990;
+      display:none;
+    }
+    .wordbank-inner{
+      max-width:960px;
+      margin:0 auto;
+      padding:0 10px;
+    }
+    .word-bank-title{ font-weight:bold; margin-bottom:6px; font-size:14px; }
+    .word-bank{
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:10px;
+      min-height:52px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      background:#fafafa;
+    }
+    .word-chip{
+      padding:8px 12px;
+      border-radius:18px;
+      border:1px solid #666;
+      background:#f5f5f5;
+      cursor:pointer;
+      user-select:none;
+      font-size:14px;
+    }
+    .word-chip.used{ opacity:0.3; cursor:default; }
+    .word-chip.selected-chip{
+      border-color:#1976d2;
+      background:#e3f2fd;
+      box-shadow:0 0 0 2px #bbdefb;
+    }
+
+    /* 図の表示 */
+    .img-row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; margin:12px 0; }
+    .img-card{ background:#fff; border:1px solid #ddd; border-radius:10px; padding:10px; width:min(440px, 100%); }
+    .img-card img{ width:100%; height:auto; border-radius:8px; border:1px solid #eee; display:block; }
+    .img-caption{ margin-top:8px; font-weight:bold; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+
+    /* 次の単元 */
+    .next-unit-fixed{
+      position:fixed; right:18px; bottom:190px;
+      z-index:9991; background:#2e7d32; color:#fff;
+      text-decoration:none; padding:10px 14px; border-radius:12px;
+      font-weight:bold; box-shadow:0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    /* ポップアップ */
+    .popup-overlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.4);
+      display:none; align-items:center; justify-content:center;
+      z-index:9999;
+    }
+    .popup-box{
+      background:#fff; max-width:600px; width:92%; padding:20px;
+      border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.3);
+      font-size:15px; line-height:1.7;
+    }
+    .popup-title{ font-weight:bold; margin-bottom:10px; font-size:17px; color:#b30000; border-bottom:1px solid #eee; padding-bottom:5px; }
+    .popup-close-btn{
+      margin-top:15px; padding:8px 20px; border-radius:8px;
+      border:none; background:#1976d2; color:#fff; cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🌸 飛鳥時代：聖徳太子の国づくり</h1>
+
+  <a class="next-unit-fixed" href="#" title="次の単元へ">次の単元に行く</a>
+
+  <div class="step-bar">
+    <div class="step active" data-step="1">① 仏教と太子</div>
+    <div class="step" data-step="2">② 制度と憲法</div>
+    <div class="step" data-step="3">③ 遣隋使</div>
+    <div class="step" data-step="4">④ 飛鳥文化</div>
+  </div>
+
+  <div class="section active" data-section="1">
+    <h2>1. 仏教をめぐる争いと聖徳太子の登場</h2>
+    <div class="pop-line">
+      <div class="pop-title">pop1：なぜ百済は仏教を日本に伝えたのか</div>
+      <button class="pop-btn" onclick="showPopup('pop1')">解説を見る</button>
+    </div>
+    <div class="pop-line">
+      <div class="pop-title">pop2：なぜ蘇我氏は仏教をえらんだのか</div>
+      <button class="pop-btn" onclick="showPopup('pop2')">解説を見る</button>
+    </div>
+
+    <div class="question-text">
+      6世紀後半、日本に伝わった[ <span class="blank" data-section="1" data-blank-id="A"></span> ]<span class="reading">（ぶっきょう）</span>を受け入れるかどうかで、有力な豪族同士の激しい争いが起こりました。<br><br>
+      [ <span class="blank" data-section="1" data-blank-id="B"></span> ]<span class="reading">（そがうじ）</span>：天皇中心の政治のために仏教が必要だと考えました。<br><br>
+      [ <span class="blank" data-section="1" data-blank-id="C"></span> ]<span class="reading">（もののべうじ）</span>：日本古来の神様を大切にする立場から反対しました。<br><br>
+      結果、蘇我氏が物部氏を倒し、一族の[ <span class="blank" data-section="1" data-blank-id="D"></span> ]<span class="reading">（すいこてんのう）</span>を立てました。この時、天皇に代わって政治を行う[ <span class="blank" data-section="1" data-blank-id="E"></span> ]<span class="reading">（せっしょう）</span>に任命されたのが、甥の[ <span class="blank" data-section="1" data-blank-id="F"></span> ]<span class="reading">（しょうとくたいし）</span>です。
+    </div>
+
+    <div class="controls">
+      <button class="start-btn" data-section="1">チャレンジ開始</button>
+      <button class="check-btn" data-section="1">判定</button>
+      <button class="secondary reset-btn" data-section="1">リセット</button>
+      <button class="next-section-btn" data-section="1" disabled>次へ ▶</button>
+      <button class="secondary explain-btn" data-section="1">【解説】</button>
+    </div>
+    <div class="result-message" id="result-1"></div>
+    <div class="timer-info" id="timer-1">経過時間：---</div>
+    <div class="explain-box" id="explain-1">
+      蘇我氏と物部氏が対立し、勝利した蘇我氏が推古天皇を即位させました。聖徳太子は摂政として政治を助けました。
+    </div>
+  </div>
+
+  <div class="section" data-section="2">
+    <h2>2. 聖徳太子の新しい国づくり（制度と憲法）</h2>
+    <div class="pop-line">
+      <div class="pop-title">pop3：なぜ蘇我氏を政界から遠ざけようとしたのか</div>
+      <button class="pop-btn" onclick="showPopup('pop3')">解説を見る</button>
+    </div>
+    <div class="question-text">
+      [ <span class="blank" data-section="2" data-blank-id="A"></span> ]<span class="reading">（かんいじゅうにかい）</span>：603年制定。家柄に関係なく能力のある人を役人に選ぶ制度です。<br><br>
+      [ <span class="blank" data-section="2" data-blank-id="B"></span> ]<span class="reading">（じゅうしちじょうのけんぽう）</span>：604年制定。役人の心がまえを説いた法律です。
+    </div>
+    <div class="controls">
+      <button class="start-btn" data-section="2">チャレンジ開始</button>
+      <button class="check-btn" data-section="2">判定</button>
+      <button class="next-section-btn" data-section="2" disabled>次へ ▶</button>
+    </div>
+    <div class="result-message" id="result-2"></div>
+    <div class="timer-info" id="timer-2"></div>
+  </div>
+
+  <div class="section" data-section="3">
+    <h2>3. 外国との外交（遣隋使）</h2>
+    <div class="pop-line">
+      <div class="pop-title">pop4：中国（隋）と対等外交を行えた理由</div>
+      <button class="pop-btn" onclick="showPopup('pop4')">解説を見る</button>
+    </div>
+    <div class="question-text">
+      聖徳太子は、607年に[ <span class="blank" data-section="3" data-blank-id="A"></span> ]<span class="reading">（けんずいし）</span>の[ <span class="blank" data-section="3" data-blank-id="B"></span> ]<span class="reading">（おののいもこ）</span>らを中国（[ <span class="blank" data-section="3" data-blank-id="C"></span> ]）へ送りました。当時の隋は[ <span class="blank" data-section="3" data-blank-id="D"></span> ]との対立もあり、日本との交流を受け入れました。
+    </div>
+    <div class="controls">
+      <button class="start-btn" data-section="3">チャレンジ開始</button>
+      <button class="check-btn" data-section="3">判定</button>
+      <button class="next-section-btn" data-section="3" disabled>次へ ▶</button>
+    </div>
+    <div class="result-message" id="result-3"></div>
+    <div class="timer-info" id="timer-3"></div>
+  </div>
+
+  <div class="section" data-section="4">
+    <h2>4. 飛鳥文化（日本初の仏教文化）</h2>
+    <div class="question-text">
+      聖徳太子が活躍した時代の文化を[ <span class="blank" data-section="4" data-blank-id="A"></span> ]といいます。
+      <div class="img-row">
+        <div class="img-card">
+          <img src="{{ url_for('static', filename='img/history/houryuji.png') }}" alt="法隆寺">
+          <div class="img-caption">図：[ <span class="blank" data-section="4" data-blank-id="B"></span> ]</div>
+        </div>
+        <div class="img-card">
+          <img src="{{ url_for('static', filename='img/history/shakasansonzou.png') }}" alt="釈迦三尊像">
+          <div class="img-caption">図：[ <span class="blank" data-section="4" data-blank-id="C"></span> ]</div>
+          <div style="font-size:13px; margin-top:5px;">作者：[ <span class="blank" data-section="4" data-blank-id="D"></span> ]</div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="start-btn" data-section="4">チャレンジ開始</button>
+      <button class="check-btn" data-section="4">判定</button>
+      <button class="next-section-btn" data-section="4" disabled>全クリア！</button>
+    </div>
+    <div class="result-message" id="result-4"></div>
+    <div class="timer-info" id="timer-4"></div>
+  </div>
+
+  <div id="popup-overlay" class="popup-overlay" onclick="hidePopup()">
+    <div class="popup-box" onclick="event.stopPropagation()">
+      <div id="popup-title" class="popup-title"></div>
+      <div id="popup-body" class="popup-body"></div>
+      <button class="popup-close-btn" onclick="hidePopup()">閉じる</button>
+    </div>
+  </div>
+
+  <div id="wordbank-fixed" class="wordbank-fixed">
+    <div class="wordbank-inner">
+      <div class="word-bank-title">【語群】（クリックして空欄を埋めよう）</div>
+      <div class="word-bank" id="word-bank"></div>
+    </div>
+  </div>
+
+<script>
+  const sectionData = {
+    1: { answers: { A:"仏教", B:"蘇我氏", C:"物部氏", D:"推古天皇", E:"摂政", F:"聖徳太子" }, choices: ["仏教","蘇我氏","物部氏","推古天皇","摂政","聖徳太子"] },
+    2: { answers: { A:"冠位十二階", B:"十七条の憲法" }, choices: ["冠位十二階","十七条の憲法"] },
+    3: { answers: { A:"遣隋使", B:"小野妹子", C:"隋", D:"高句麗" }, choices: ["遣隋使","小野妹子","隋","高句麗"] },
+    4: { answers: { A:"飛鳥文化", B:"法隆寺", C:"釈迦三尊像", D:"鞍作鳥" }, choices: ["飛鳥文化","法隆寺","釈迦三尊像","鞍作鳥"] }
+  };
+
+  const POPUP_DATA = {
+    pop1: { title: "なぜ百済は仏教を日本に伝えたのか", body: "百済は隣国の圧迫から逃れるため、日本に軍事支援を求めていました。その「外交の切り札」として、当時最新の高度な知識体系であった仏教を伝えたのです。" },
+    pop2: { title: "なぜ蘇我氏は仏教をえらんだのか", body: "蘇我氏は渡来人と繋がりが深く、仏教という新しい教えを取り入れることで、古い習慣に縛られた他の豪族を圧倒し、天皇を中心とした新しい国づくりを主導しようとしました。" },
+    pop3: { title: "なぜ蘇我氏を政界から遠ざけようとしたのか", body: "推古天皇と聖徳太子は、特定の豪族（蘇我氏）が権力を独占するのを防ぎたかったため、個人の能力を重視する「冠位十二階」などを導入し、天皇中心の政治を目指しました。" },
+    pop4: { title: "中国（隋）と対等外交を行えた理由", body: "当時、隋は高句麗との戦争に備えており、日本が敵対することを恐れていました。聖徳太子はその国際情勢を読み、強気の「対等外交」を仕掛けたのです。" }
+  };
+
+  let currentSection = 1;
+  let selectedChip = null;
+  const sectionStates = { 1:{ attempts:[], startTime:null, intervalId:null }, 2:{ attempts:[], startTime:null, intervalId:null }, 3:{ attempts:[], startTime:null, intervalId:null }, 4:{ attempts:[], startTime:null, intervalId:null } };
+
+  // ポップアップ制御
+  function showPopup(key) {
+    const data = POPUP_DATA[key];
+    document.getElementById('popup-title').textContent = data.title;
+    document.getElementById('popup-body').textContent = data.body;
+    document.getElementById('popup-overlay').style.display = 'flex';
+  }
+  function hidePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
+
+  // 語群のシャッフル
+  function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+  // 語群のレンダリング
+  function renderWordBank(section) {
+    document.getElementById('wordbank-fixed').style.display = 'block';
+    const bank = document.getElementById('word-bank');
+    bank.innerHTML = '';
+    shuffle(sectionData[section].choices).forEach(word => {
+      const chip = document.createElement('div');
+      chip.className = 'word-chip';
+      chip.textContent = word;
+      chip.onclick = () => {
+        if (chip.classList.contains('used')) return;
+        if (selectedChip) selectedChip.classList.remove('selected-chip');
+        selectedChip = chip;
+        chip.classList.add('selected-chip');
+      };
+      bank.appendChild(chip);
+    });
+  }
+
+  // タイマー
+  function startTimer(section) {
+    const state = sectionStates[section];
+    state.startTime = Date.now();
+    state.intervalId = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+      document.getElementById(`timer-${section}`).textContent = `経過時間：${elapsed}秒`;
+    }, 1000);
+  }
+
+  // 空欄クリック時の処理
+  document.querySelectorAll('.blank').forEach(blank => {
+    blank.onclick = () => {
+      if (Number(blank.dataset.section) !== currentSection) return;
+      if (selectedChip) {
+        if (blank.dataset.word) {
+          const oldChip = Array.from(document.querySelectorAll('.word-chip')).find(c => c.textContent === blank.dataset.word);
+          if (oldChip) oldChip.classList.remove('used');
+        }
+        blank.textContent = selectedChip.textContent;
+        blank.dataset.word = selectedChip.textContent;
+        selectedChip.classList.add('used');
+        selectedChip.classList.remove('selected-chip');
+        selectedChip = null;
+      } else if (blank.dataset.word) {
+        const oldChip = Array.from(document.querySelectorAll('.word-chip')).find(c => c.textContent === blank.dataset.word);
+        if (oldChip) oldChip.classList.remove('used');
+        blank.textContent = '';
+        blank.dataset.word = '';
+      }
+    };
+  });
+
+  // 判定処理
+  function checkSection(section) {
+    const blanks = document.querySelectorAll(`.blank[data-section="${section}"]`);
+    let allCorrect = true;
+    blanks.forEach(b => {
+      if (b.dataset.word === sectionData[section].answers[b.dataset.blankId]) {
+        b.classList.add('correct');
+      } else {
+        allCorrect = false;
+        b.classList.remove('correct');
+      }
+    });
+
+    const res = document.getElementById(`result-${section}`);
+    if (allCorrect) {
+      clearInterval(sectionStates[section].intervalId);
+      res.textContent = "⭕ 正解！お見事です。";
+      res.style.color = "green";
+      document.querySelector(`.next-section-btn[data-section="${section}"]`).disabled = false;
+      document.querySelector(`.step[data-step="${section}"]`).classList.add('done');
+    } else {
+      res.textContent = "❌ 違う箇所があります。もう一度見直そう。";
+      res.style.color = "red";
+    }
+  }
+
+  // 各種ボタンイベント
+  document.querySelectorAll('.start-btn').forEach(btn => {
+    btn.onclick = () => {
+      const s = Number(btn.dataset.section);
+      currentSection = s;
+      document.body.classList.add('challenge-mode');
+      document.querySelectorAll(`.blank[data-section="${s}"]`).forEach(b => { b.textContent = ''; b.dataset.word = ''; b.classList.remove('correct'); });
+      renderWordBank(s);
+      startTimer(s);
+    };
+  });
+
+  document.querySelectorAll('.check-btn').forEach(btn => {
+    btn.onclick = () => checkSection(Number(btn.dataset.section));
+  });
+
+  document.querySelectorAll('.next-section-btn').forEach(btn => {
+    btn.onclick = () => {
+      const next = Number(btn.dataset.section) + 1;
+      if (next <= 4) goToSection(next);
+    };
+  });
+
+  function goToSection(s) {
+    currentSection = s;
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    document.querySelector(`.section[data-section="${s}"]`).classList.add('active');
+    document.querySelectorAll('.step').forEach(st => st.classList.remove('active'));
+    document.querySelector(`.step[data-step="${s}"]`).classList.add('active');
+    document.getElementById('wordbank-fixed').style.display = 'none';
+    document.body.classList.remove('challenge-mode');
+  }
+
+  // 初期化：最初は答えを入れた状態で表示
+  window.onload = () => {
+    for (let s = 1; s <= 4; s++) {
+      const blanks = document.querySelectorAll(`.blank[data-section="${s}"]`);
+      blanks.forEach(b => {
+        b.textContent = sectionData[s].answers[b.dataset.blankId];
+        b.dataset.word = b.textContent;
+      });
+    }
+  };
+
+  function toggleExplain(s) {
+    const box = document.getElementById(`explain-${s}`);
+    box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+  }
+  document.querySelectorAll('.explain-btn').forEach(btn => {
+    btn.onclick = () => toggleExplain(Number(btn.dataset.section));
+  });
+</script>
+</body>
+</html>
